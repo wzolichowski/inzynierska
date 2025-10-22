@@ -10,8 +10,58 @@
         input[type="file"] { display: block; margin: 20px auto; }
         button { display: block; width: 100%; padding: 12px; font-size: 16px; background-color: #0078D4; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:disabled { background-color: #aaa; }
-        #results { margin-top: 30px; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px; white-space: pre-wrap; /* Zachowuje formatowanie JSON */ }
+        
+        /* ZMIANA 1: Stylowanie nowego <div> zamiast <pre> */
+        #results { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background-color: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 4px;
+        }
+
         #status { text-align: center; font-style: italic; color: #555; }
+
+        /* --- NOWE STYLE DLA ŁADNYCH WYNIKÓW --- */
+        #results h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* Styl dla wykrytego opisu (caption) */
+        #results p {
+            font-size: 1.1em;
+            font-style: italic;
+            color: #005A9E; /* Ciemniejszy niebieski */
+            background-color: #f0f7ff;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #0078D4;
+        }
+
+        /* Style dla "pigułek" z tagami */
+        #results ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* Odstępy między pigułkami */
+        }
+
+        #results li {
+            background-color: #0078D4;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 16px; /* Zaokrąglenie pigułki */
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* --- KONIEC NOWYCH STYLI --- */
+
     </style>
 </head>
 <body>
@@ -24,7 +74,8 @@
     <div id="status"></div>
     
     <h3>Wyniki analizy:</h3>
-    <pre id="results">Tutaj pojawią się wyniki...</pre>
+    
+    <div id="results">Tutaj pojawią się wyniki...</div>
 
     <script>
         const imageInput = document.getElementById('imageInput');
@@ -39,41 +90,51 @@
                 return;
             }
 
-            // Przygotowujemy dane do wysyłki (jako "formularz")
             const formData = new FormData();
             formData.append('file', file);
 
-            // Blokujemy przycisk i pokazujemy status
             uploadButton.disabled = true;
             statusDiv.textContent = 'Analizowanie... Proszę czekać.';
-            resultsDiv.textContent = 'Trwa ładowanie...';
+            resultsDiv.innerHTML = 'Trwa ładowanie...'; // Używamy innerHTML, aby wyczyścić stare wyniki
 
             try {
-                // Wysyłamy plik do naszego API w Pythonie
-                // Adres '/api/AnalyzeImage' jest automatycznie zarządzany przez Azure Static Web Apps
                 const response = await fetch('/api/AnalyzeImage', {
                     method: 'POST',
                     body: formData 
-                    // Nie ustawiamy 'Content-Type', przeglądarka zrobi to za nas
                 });
 
+                // --- ZMIANA 3: NOWA LOGIKA WYŚWIETLANIA WYNIKÓW ---
                 if (response.ok) {
                     const data = await response.json();
-                    // Formatujemy JSON, aby był ładnie wyświetlony
-                    resultsDiv.textContent = JSON.stringify(data, null, 2);
+                    
+                    // Budujemy listę tagów jako elementy <li>
+                    const tagsHtml = data.tags.map(tag => `<li>${tag}</li>`).join('');
+
+                    // Budujemy cały nowy HTML dla wyników
+                    resultsDiv.innerHTML = `
+                        <h4>Wykryty opis:</h4>
+                        <p>${data.caption}</p>
+
+                        <h4>Wykryte tagi (${data.tags.length}):</h4>
+                        <ul>
+                            ${tagsHtml}
+                        </ul>
+                    `;
+                    
                     statusDiv.textContent = 'Analiza zakończona!';
                 } else {
+                    // Wyświetlanie błędu pozostaje bez zmian
                     const errorText = await response.text();
-                    resultsDiv.textContent = `Błąd: ${errorText}`;
+                    resultsDiv.innerHTML = `<span style="color: red;">${errorText}</span>`;
                     statusDiv.textContent = 'Wystąpił błąd.';
                 }
+                // --- KONIEC ZMIANY 3 ---
 
             } catch (error) {
                 console.error('Błąd wysyłania:', error);
                 resultsDiv.textContent = `Błąd sieci: ${error.message}`;
                 statusDiv.textContent = 'Wystąpił błąd sieci.';
             } finally {
-                // Odblokowujemy przycisk
                 uploadButton.disabled = false;
             }
         });
