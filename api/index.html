@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizator Obrazów</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background-color: #f4f4f4; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #0078D4; }
+        input[type="file"] { display: block; margin: 20px auto; }
+        button { display: block; width: 100%; padding: 12px; font-size: 16px; background-color: #0078D4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background-color: #aaa; }
+        #results { margin-top: 30px; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px; white-space: pre-wrap; /* Zachowuje formatowanie JSON */ }
+        #status { text-align: center; font-style: italic; color: #555; }
+    </style>
+</head>
+<body>
+
+    <h1>Analizator Obrazów AI</h1>
+    <p>Wybierz obraz (JPG, PNG) ze swojego komputera, aby zobaczyć, co wykryje na nim sztuczna inteligencja Azure.</p>
+
+    <input type="file" id="imageInput" accept="image/jpeg, image/png">
+    <button id="uploadButton">Analizuj obraz</button>
+    <div id="status"></div>
+    
+    <h3>Wyniki analizy:</h3>
+    <pre id="results">Tutaj pojawią się wyniki...</pre>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const resultsDiv = document.getElementById('results');
+        const statusDiv = document.getElementById('status');
+
+        uploadButton.addEventListener('click', async () => {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert("Proszę wybrać plik!");
+                return;
+            }
+
+            // Przygotowujemy dane do wysyłki (jako "formularz")
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Blokujemy przycisk i pokazujemy status
+            uploadButton.disabled = true;
+            statusDiv.textContent = 'Analizowanie... Proszę czekać.';
+            resultsDiv.textContent = 'Trwa ładowanie...';
+
+            try {
+                // Wysyłamy plik do naszego API w Pythonie
+                // Adres '/api/AnalyzeImage' jest automatycznie zarządzany przez Azure Static Web Apps
+                const response = await fetch('/api/AnalyzeImage', {
+                    method: 'POST',
+                    body: formData 
+                    // Nie ustawiamy 'Content-Type', przeglądarka zrobi to za nas
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Formatujemy JSON, aby był ładnie wyświetlony
+                    resultsDiv.textContent = JSON.stringify(data, null, 2);
+                    statusDiv.textContent = 'Analiza zakończona!';
+                } else {
+                    const errorText = await response.text();
+                    resultsDiv.textContent = `Błąd: ${errorText}`;
+                    statusDiv.textContent = 'Wystąpił błąd.';
+                }
+
+            } catch (error) {
+                console.error('Błąd wysyłania:', error);
+                resultsDiv.textContent = `Błąd sieci: ${error.message}`;
+                statusDiv.textContent = 'Wystąpił błąd sieci.';
+            } finally {
+                // Odblokowujemy przycisk
+                uploadButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
