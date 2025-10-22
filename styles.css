@@ -169,6 +169,25 @@ button:disabled {
     font-size: 1.3em;
 }
 
+.image-preview-section h3::before {
+    content: '🖼️';
+}
+
+.image-preview-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.image-preview-container img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    object-fit: contain;
+}
+
 .caption {
     font-size: 1.15em;
     color: #444;

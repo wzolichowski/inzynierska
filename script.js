@@ -8,6 +8,7 @@ const captionText = document.getElementById('captionText');
 const tagsContainer = document.getElementById('tagsContainer');
 const statusDiv = document.getElementById('status');
 const loadingSpinner = document.getElementById('loadingSpinner');
+const imagePreview = document.getElementById('imagePreview');
 
 // File selection handler
 imageInput.addEventListener('change', (e) => {
@@ -15,6 +16,13 @@ imageInput.addEventListener('change', (e) => {
     if (file) {
         selectedFile.textContent = `📁 ${file.name}`;
         selectedFile.classList.add('show');
+        
+        // Preview the image
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     }
 });
 
@@ -42,6 +50,13 @@ uploadArea.addEventListener('drop', (e) => {
         imageInput.files = e.dataTransfer.files;
         selectedFile.textContent = `📁 ${file.name}`;
         selectedFile.classList.add('show');
+        
+        // Preview the image
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
     } else {
         alert('Proszę wybrać plik JPG lub PNG!');
     }
