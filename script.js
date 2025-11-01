@@ -79,31 +79,6 @@ async function updateResultsDisplay(lang) {
     }
 }
 
-// Language toggle handlers
-langPL.addEventListener('click', () => {
-    if (currentLanguage === 'pl') return;
-    
-    currentLanguage = 'pl';
-    langPL.classList.add('active');
-    langEN.classList.remove('active');
-    
-    if (originalCaption) {
-        updateResultsDisplay('pl');
-    }
-});
-
-langEN.addEventListener('click', () => {
-    if (currentLanguage === 'en') return;
-    
-    currentLanguage = 'en';
-    langEN.classList.add('active');
-    langPL.classList.remove('active');
-    
-    if (originalCaption) {
-        updateResultsDisplay('en');
-    }
-});
-
 // File selection handler
 imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
