@@ -3,9 +3,6 @@
 .env.local
 .env.production
 
-# Firebase config (generated from template)
-firebase-config.js
-
 # Azure Functions
 local.settings.json
 __pycache__/
