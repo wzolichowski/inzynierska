@@ -1,3 +1,4 @@
 azure-functions
 msrestazure
 azure-cognitiveservices-vision-computervision
+firebase
