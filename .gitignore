@@ -1,3 +1,36 @@
-*.DS_Store
-*local.settings.json
-*firebase-config.js
+# Environment files
+.env
+.env.local
+.env.production
+
+# Firebase config (generated from template)
+firebase-config.js
+
+# Azure Functions
+local.settings.json
+__pycache__/
+*.py[cod]
+*$py.class
+.python_packages/
+.venv/
+venv/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
