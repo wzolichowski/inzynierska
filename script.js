@@ -9,6 +9,100 @@ const tagsContainer = document.getElementById('tagsContainer');
 const statusDiv = document.getElementById('status');
 const loadingSpinner = document.getElementById('loadingSpinner');
 const imagePreview = document.getElementById('imagePreview');
+const langPL = document.getElementById('langPL');
+const langEN = document.getElementById('langEN');
+
+// Language state
+let currentLanguage = 'pl';
+let originalCaption = '';
+let originalTags = [];
+
+// Translation function
+async function translateText(text, targetLang) {
+    try {
+        const token = await getUserToken();
+        
+        const response = await fetch('/api/TranslateText', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            },
+            body: JSON.stringify({
+                text: text,
+                targetLanguage: targetLang
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.translation;
+        } else {
+            console.error('Translation failed');
+            return text;
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text;
+    }
+}
+
+// Update results display with translation
+async function updateResultsDisplay(lang) {
+    if (!originalCaption && !originalTags.length) return;
+
+    loadingSpinner.classList.add('show');
+    statusDiv.textContent = lang === 'pl' ? '🔄 Tłumaczenie na polski...' : '🔄 Translating to English...';
+
+    try {
+        // Translate caption
+        const translatedCaption = await translateText(originalCaption, lang);
+        captionText.textContent = translatedCaption;
+
+        // Translate tags
+        tagsContainer.innerHTML = '';
+        for (let i = 0; i < originalTags.length; i++) {
+            const translatedTag = await translateText(originalTags[i], lang);
+            const tagElement = document.createElement('div');
+            tagElement.className = 'tag';
+            tagElement.textContent = translatedTag;
+            tagElement.style.animationDelay = `${i * 0.05}s`;
+            tagsContainer.appendChild(tagElement);
+        }
+
+        statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
+    } catch (error) {
+        console.error('Display update error:', error);
+        statusDiv.textContent = '⚠️ Błąd tłumaczenia';
+    } finally {
+        loadingSpinner.classList.remove('show');
+    }
+}
+
+// Language toggle handlers
+langPL.addEventListener('click', () => {
+    if (currentLanguage === 'pl') return;
+    
+    currentLanguage = 'pl';
+    langPL.classList.add('active');
+    langEN.classList.remove('active');
+    
+    if (originalCaption) {
+        updateResultsDisplay('pl');
+    }
+});
+
+langEN.addEventListener('click', () => {
+    if (currentLanguage === 'en') return;
+    
+    currentLanguage = 'en';
+    langEN.classList.add('active');
+    langPL.classList.remove('active');
+    
+    if (originalCaption) {
+        updateResultsDisplay('en');
+    }
+});
 
 // File selection handler
 imageInput.addEventListener('change', (e) => {
@@ -64,6 +158,11 @@ uploadArea.addEventListener('drop', (e) => {
 
 // Image analysis handler
 uploadButton.addEventListener('click', async () => {
+    if (!currentUser) {
+        showMessage('❌ Musisz być zalogowany, aby analizować obrazy!', 'error');
+        return;
+    }
+
     const file = imageInput.files[0];
     if (!file) {
         alert("Proszę wybrać plik!");
@@ -79,34 +178,63 @@ uploadButton.addEventListener('click', async () => {
     resultsContainer.classList.remove('show');
 
     try {
+        // Get user token for authenticated requests
+        const token = await getUserToken();
+        
+        const headers = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch('/api/AnalyzeImage', {
             method: 'POST',
-            body: formData 
+            body: formData,
+            headers: headers
         });
 
         if (response.ok) {
             const data = await response.json();
             
-            // Display caption
-            captionText.textContent = data.caption || 'Brak opisu';
+            // Store original English results
+            originalCaption = data.caption || 'No description';
+            originalTags = data.tags || [];
 
-            // Display tags
-            tagsContainer.innerHTML = '';
-            if (data.tags && data.tags.length > 0) {
-                data.tags.forEach((tag, index) => {
+            // Display in current language
+            if (currentLanguage === 'pl') {
+                // Translate to Polish
+                const translatedCaption = await translateText(originalCaption, 'pl');
+                captionText.textContent = translatedCaption;
+
+                // Translate tags
+                tagsContainer.innerHTML = '';
+                for (let i = 0; i < originalTags.length; i++) {
+                    const translatedTag = await translateText(originalTags[i], 'pl');
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.textContent = translatedTag;
+                    tagElement.style.animationDelay = `${i * 0.05}s`;
+                    tagsContainer.appendChild(tagElement);
+                }
+            } else {
+                // Display in English
+                captionText.textContent = originalCaption;
+
+                tagsContainer.innerHTML = '';
+                originalTags.forEach((tag, index) => {
                     const tagElement = document.createElement('div');
                     tagElement.className = 'tag';
                     tagElement.textContent = tag;
                     tagElement.style.animationDelay = `${index * 0.05}s`;
                     tagsContainer.appendChild(tagElement);
                 });
-            } else {
-                tagsContainer.innerHTML = '<p style="color: #999;">Nie wykryto żadnych tagów</p>';
             }
 
             resultsContainer.classList.add('show');
             statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
             loadingSpinner.classList.remove('show');
+        } else if (response.status === 401) {
+            showMessage('❌ Sesja wygasła. Proszę zalogować się ponownie.', 'error');
+            await auth.signOut();
         } else {
             const errorText = await response.text();
             statusDiv.innerHTML = `<div class="result-section error">❌ Błąd: ${errorText}</div>`;
