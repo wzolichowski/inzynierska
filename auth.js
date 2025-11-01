@@ -21,7 +21,6 @@ const registerGoogle = document.getElementById('registerGoogle');
 const authButtons = document.getElementById('authButtons');
 const userMenu = document.getElementById('userMenu');
 const userGreeting = document.getElementById('userGreeting');
-const loginRequired = document.getElementById('loginRequired');
 const uploadSection = document.getElementById('uploadSection');
 
 // Show/Hide Modals
@@ -79,11 +78,9 @@ function clearModalErrors() {
 
 // Show error in modal
 function showModalError(formElement, message) {
-    // Remove old error if exists
     const oldError = formElement.parentElement.querySelector('.modal-error');
     if (oldError) oldError.remove();
     
-    // Create new error message
     const errorDiv = document.createElement('div');
     errorDiv.className = 'modal-error';
     errorDiv.innerHTML = `
@@ -91,10 +88,8 @@ function showModalError(formElement, message) {
         <span class="error-text">${message}</span>
     `;
     
-    // Insert before form
     formElement.parentElement.insertBefore(errorDiv, formElement);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
@@ -108,7 +103,6 @@ loginForm.addEventListener('submit', async (e) => {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
-    // Client-side validation
     if (!email || !password) {
         showModalError(loginForm, 'Proszę wypełnić wszystkie pola');
         return;
@@ -134,7 +128,6 @@ registerForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('registerPassword').value;
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
 
-    // Client-side validation
     if (!email || !password || !passwordConfirm) {
         showModalError(registerForm, 'Proszę wypełnić wszystkie pola');
         return;
@@ -150,7 +143,6 @@ registerForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         showModalError(registerForm, 'Nieprawidłowy format adresu email');
@@ -180,7 +172,6 @@ loginGoogle.addEventListener('click', async () => {
         console.error('Google login error:', error);
         
         if (error.code === 'auth/popup-closed-by-user') {
-            // User closed popup - don't show error
             return;
         }
         
@@ -201,7 +192,6 @@ registerGoogle.addEventListener('click', async () => {
         console.error('Google registration error:', error);
         
         if (error.code === 'auth/popup-closed-by-user') {
-            // User closed popup - don't show error
             return;
         }
         
@@ -229,6 +219,8 @@ auth.onAuthStateChanged((user) => {
 
 // Update UI based on auth state
 function updateUI() {
+    const heroSection = document.getElementById('heroSection');
+    
     if (currentUser) {
         // User is logged in
         authButtons.style.display = 'none';
@@ -237,18 +229,18 @@ function updateUI() {
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         userGreeting.textContent = `Cześć, ${displayName}!`;
         
-        loginRequired.style.display = 'none';
+        if (heroSection) heroSection.style.display = 'none';
         uploadSection.style.display = 'block';
     } else {
         // User is logged out
         authButtons.style.display = 'flex';
         userMenu.style.display = 'none';
-        loginRequired.style.display = 'block';
+        if (heroSection) heroSection.style.display = 'block';
         uploadSection.style.display = 'none';
     }
 }
 
-// Show messages (global notifications)
+// Show messages
 function showMessage(message, type) {
     const statusDiv = document.getElementById('status');
     statusDiv.innerHTML = `<div class="result-section ${type === 'error' ? 'error' : ''}">${message}</div>`;
@@ -261,36 +253,27 @@ function showMessage(message, type) {
 // Get user-friendly error messages
 function getErrorMessage(errorCode) {
     const messages = {
-        // Login errors
         'auth/user-not-found': '❌ Nie znaleziono konta z tym adresem email',
         'auth/wrong-password': '❌ Nieprawidłowe hasło',
         'auth/invalid-email': '❌ Nieprawidłowy adres email',
         'auth/user-disabled': '❌ To konto zostało zablokowane',
         'auth/invalid-credential': '❌ Nieprawidłowy email lub hasło',
-        
-        // Registration errors
         'auth/email-already-in-use': '❌ Ten adres email jest już używany',
         'auth/weak-password': '❌ Hasło jest za słabe (minimum 6 znaków)',
         'auth/operation-not-allowed': '❌ Rejestracja jest obecnie niedostępna',
-        
-        // Google auth errors
         'auth/popup-closed-by-user': '❌ Anulowano logowanie',
         'auth/cancelled-popup-request': '❌ Anulowano żądanie',
         'auth/popup-blocked': '❌ Popup został zablokowany przez przeglądarkę',
         'auth/account-exists-with-different-credential': '❌ Konto z tym emailem już istnieje',
-        
-        // Network errors
         'auth/network-request-failed': '❌ Błąd połączenia z siecią',
         'auth/too-many-requests': '❌ Zbyt wiele prób. Spróbuj ponownie później',
-        
-        // Other errors
         'auth/internal-error': '❌ Wystąpił błąd serwera. Spróbuj ponownie',
     };
     
     return messages[errorCode] || `❌ Wystąpił błąd: ${errorCode}`;
 }
 
-// Get current user's ID token (for backend authentication)
+// Get current user's ID token
 async function getUserToken() {
     if (!currentUser) return null;
     

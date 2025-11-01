@@ -9,11 +9,6 @@ const tagsContainer = document.getElementById('tagsContainer');
 const statusDiv = document.getElementById('status');
 const loadingSpinner = document.getElementById('loadingSpinner');
 const imagePreview = document.getElementById('imagePreview');
-// Usunięto zmienne langPL i langEN
-
-// Usunięto Language state
-// Usunięto funkcję translateText
-// Usunięto funkcję updateResultsDisplay
 
 // File selection handler
 imageInput.addEventListener('change', (e) => {
@@ -22,7 +17,6 @@ imageInput.addEventListener('change', (e) => {
         selectedFile.textContent = `📁 ${file.name}`;
         selectedFile.classList.add('show');
         
-        // Preview the image
         const reader = new FileReader();
         reader.onload = (e) => {
             imagePreview.src = e.target.result;
@@ -56,7 +50,6 @@ uploadArea.addEventListener('drop', (e) => {
         selectedFile.textContent = `📁 ${file.name}`;
         selectedFile.classList.add('show');
         
-        // Preview the image
         const reader = new FileReader();
         reader.onload = (e) => {
             imagePreview.src = e.target.result;
@@ -89,7 +82,6 @@ uploadButton.addEventListener('click', async () => {
     resultsContainer.classList.remove('show');
 
     try {
-        // Get user token for authenticated requests
         const token = await getUserToken();
         
         const headers = {};
@@ -106,12 +98,8 @@ uploadButton.addEventListener('click', async () => {
         if (response.ok) {
             const data = await response.json();
             
-            // ZMODYFIKOWANY BLOK: Bezpośrednie wyświetlanie wyników (bez tłumaczenia)
-            
-            // 1. Wyświetl podpis
             captionText.textContent = data.caption || 'No description';
 
-            // 2. Wyświetl tagi
             tagsContainer.innerHTML = '';
             const tags = data.tags || [];
             tags.forEach((tag, index) => {
@@ -121,8 +109,6 @@ uploadButton.addEventListener('click', async () => {
                 tagElement.style.animationDelay = `${index * 0.05}s`;
                 tagsContainer.appendChild(tagElement);
             });
-            
-            // KONIEC ZMODYFIKOWANEGO BLOKU
 
             resultsContainer.classList.add('show');
             statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
@@ -145,3 +131,62 @@ uploadButton.addEventListener('click', async () => {
         uploadButton.disabled = false;
     }
 });
+
+// Hero upload zone handler
+const heroUploadZone = document.getElementById('heroUploadZone');
+const heroImageInput = document.getElementById('heroImageInput');
+
+if (heroUploadZone && heroImageInput) {
+    // Click to upload
+    heroUploadZone.addEventListener('click', () => {
+        if (!currentUser) {
+            document.getElementById('loginBtn').click();
+        } else {
+            heroImageInput.click();
+        }
+    });
+
+    // Drag and drop
+    heroUploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        heroUploadZone.style.borderColor = '#764ba2';
+        heroUploadZone.style.background = 'linear-gradient(135deg, #e8ebff 0%, #dde0ff 100%)';
+    });
+
+    heroUploadZone.addEventListener('dragleave', () => {
+        heroUploadZone.style.borderColor = '#667eea';
+        heroUploadZone.style.background = 'linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%)';
+    });
+
+    heroUploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        heroUploadZone.style.borderColor = '#667eea';
+        heroUploadZone.style.background = 'linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%)';
+        
+        if (!currentUser) {
+            document.getElementById('loginBtn').click();
+            return;
+        }
+        
+        const file = e.dataTransfer.files[0];
+        if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+            heroImageInput.files = e.dataTransfer.files;
+            document.getElementById('imageInput').files = e.dataTransfer.files;
+            document.getElementById('uploadButton').click();
+        }
+    });
+
+    // File selected
+    heroImageInput.addEventListener('change', (e) => {
+        if (!currentUser) {
+            document.getElementById('loginBtn').click();
+            return;
+        }
+        
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('imageInput').files = heroImageInput.files;
+            document.getElementById('uploadButton').click();
+        }
+    });
+}

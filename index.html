@@ -10,7 +10,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-content">
-            <div class="nav-logo">🤖 AI    xdVision</div>
+            <div class="nav-logo">🤖 AI Vision</div>
             <div class="nav-menu">
                 <div id="authButtons" class="auth-buttons">
                     <button class="btn-login" id="loginBtn">Zaloguj się</button>
@@ -84,14 +84,31 @@
         </div>
 
         <div class="content">
-            <!-- Login Required Message -->
-            <div id="loginRequired" class="login-required">
-                <div class="lock-icon">🔒</div>
-                <h3>Wymagane logowanie</h3>
-                <p>Aby korzystać z analizatora obrazów, musisz się zalogować.</p>
-                <button class="btn-primary" onclick="document.getElementById('loginBtn').click()">
-                    Zaloguj się teraz
-                </button>
+            <!-- Hero Upload Section (shown when NOT logged in) -->
+            <div id="heroSection" class="hero-section">
+                <h2 class="hero-title">Przeanalizuj swoje zdjęcie w 3 sekundy</h2>
+                
+                <div class="hero-upload-zone" id="heroUploadZone">
+                    <div class="upload-icon-large">📤</div>
+                    <p class="upload-text-main">Przeciągnij lub kliknij tutaj</p>
+                    <p class="upload-text-sub">JPG, PNG • Max 4MB</p>
+                    <input type="file" id="heroImageInput" accept="image/jpeg, image/png" style="display: none;">
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span class="feature-text">Detekcja obiektów</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span class="feature-text">Opis w języku naturalnym</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <span class="feature-text">Błyskawiczna analiza</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Main Upload Area (shown when logged in) -->
