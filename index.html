@@ -10,7 +10,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-content">
-            <div class="nav-logo">🤖 AI    xdVision</div>
+            <div class="nav-logo">🤖 AI Vision</div>
             <div class="nav-menu">
                 <div id="authButtons" class="auth-buttons">
                     <button class="btn-login" id="loginBtn">Zaloguj się</button>
@@ -33,7 +33,14 @@
             
             <form id="loginForm">
                 <input type="email" id="loginEmail" placeholder="Email" required>
-                <input type="password" id="loginPassword" placeholder="Hasło" required>
+                
+                <div class="password-input-wrapper">
+                    <input type="password" id="loginPassword" placeholder="Hasło" required>
+                    <button type="button" class="password-toggle" id="toggleLoginPassword">
+                        <span class="eye-icon">👁️</span>
+                    </button>
+                </div>
+                
                 <button type="submit" class="btn-primary">Zaloguj się</button>
             </form>
 
@@ -59,8 +66,21 @@
             
             <form id="registerForm">
                 <input type="email" id="registerEmail" placeholder="Email" required>
-                <input type="password" id="registerPassword" placeholder="Hasło (min. 6 znaków)" required minlength="6">
-                <input type="password" id="registerPasswordConfirm" placeholder="Powtórz hasło" required>
+                
+                <div class="password-input-wrapper">
+                    <input type="password" id="registerPassword" placeholder="Hasło (min. 6 znaków)" required minlength="6">
+                    <button type="button" class="password-toggle" id="toggleRegisterPassword">
+                        <span class="eye-icon">👁️</span>
+                    </button>
+                </div>
+                
+                <div class="password-input-wrapper">
+                    <input type="password" id="registerPasswordConfirm" placeholder="Powtórz hasło" required>
+                    <button type="button" class="password-toggle" id="toggleRegisterPasswordConfirm">
+                        <span class="eye-icon">👁️</span>
+                    </button>
+                </div>
+                
                 <button type="submit" class="btn-primary">Zarejestruj się</button>
             </form>
 

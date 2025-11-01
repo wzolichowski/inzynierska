@@ -616,3 +616,90 @@ button:disabled {
     font-weight: 600;
     font-size: 0.95em;
 }
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper input {
+    width: 100%;
+    padding-right: 50px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    width: auto;
+    height: auto;
+    box-shadow: none;
+    transition: transform 0.2s ease;
+}
+
+.password-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: none;
+}
+
+.password-toggle:active {
+    transform: scale(0.95);
+}
+
+.eye-icon {
+    font-size: 1.3em;
+    display: block;
+    user-select: none;
+}
+
+.password-toggle.visible .eye-icon::after {
+    content: ' ';
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: #666;
+    transform: rotate(45deg);
+    left: 50%;
+    top: 50%;
+    margin-left: -1px;
+    margin-top: -10px;
+}
+
+/* Modal Error Styles */
+.modal-error {
+    background: #ffe8e8;
+    border-left: 4px solid #ff4444;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.error-icon {
+    font-size: 1.5em;
+}
+
+.error-text {
+    color: #cc0000;
+    font-weight: 600;
+    font-size: 0.95em;
+}
