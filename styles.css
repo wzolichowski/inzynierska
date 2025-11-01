@@ -579,7 +579,6 @@ button:disabled {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
 /* Modal Error Styles */
 .modal-error {
     background: #ffe8e8;
@@ -613,5 +612,3 @@ button:disabled {
     font-weight: 600;
     font-size: 0.95em;
 }
-
-
