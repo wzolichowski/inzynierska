@@ -21,7 +21,6 @@ const registerGoogle = document.getElementById('registerGoogle');
 const authButtons = document.getElementById('authButtons');
 const userMenu = document.getElementById('userMenu');
 const userGreeting = document.getElementById('userGreeting');
-const uploadSection = document.getElementById('uploadSection');
 
 // Show/Hide Modals
 loginBtn.onclick = () => {
@@ -220,6 +219,7 @@ auth.onAuthStateChanged((user) => {
 // Update UI based on auth state
 function updateUI() {
     const heroSection = document.getElementById('heroSection');
+    const uploadSection = document.getElementById('uploadSection');
     
     if (currentUser) {
         // User is logged in
@@ -229,14 +229,17 @@ function updateUI() {
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         userGreeting.textContent = `Cześć, ${displayName}!`;
         
+        // Hide hero, show upload
         if (heroSection) heroSection.style.display = 'none';
-        uploadSection.style.display = 'block';
+        if (uploadSection) uploadSection.style.display = 'block';
     } else {
         // User is logged out
         authButtons.style.display = 'flex';
         userMenu.style.display = 'none';
+        
+        // Show hero, hide upload
         if (heroSection) heroSection.style.display = 'block';
-        uploadSection.style.display = 'none';
+        if (uploadSection) uploadSection.style.display = 'none';
     }
 }
 
