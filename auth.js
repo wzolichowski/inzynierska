@@ -59,13 +59,6 @@ switchToLogin.onclick = (e) => {
     clearModalErrors();
 };
 
-switchToLogin.onclick = (e) => {
-    e.preventDefault();
-    registerModal.classList.remove('show');
-    loginModal.classList.add('show');
-    clearModalErrors();
-};
-
 // Forgot Password handler
 const forgotPassword = document.getElementById('forgotPassword');
 if (forgotPassword) {
@@ -88,7 +81,7 @@ if (forgotPassword) {
         
         try {
             await auth.sendPasswordResetEmail(email);
-            showModalError(loginForm, '✅  Jezeli adres email jest zarejestrowany, to za chwilę otrzymasz link na adresie : ' + email);
+            showModalError(loginForm, '✅ Link do resetowania hasła został wysłany na adres: ' + email + ' (sprawdź też SPAM!)');
             
             // Success styling
             const errorDiv = loginForm.parentElement.querySelector('.modal-error');
@@ -119,6 +112,7 @@ if (forgotPassword) {
         }
     };
 }
+
 // Close modal when clicking outside
 window.onclick = (e) => {
     if (e.target === loginModal) {
@@ -148,6 +142,7 @@ function clearModalErrors() {
     if (registerEmail) registerEmail.value = '';
     if (registerPassword) registerPassword.value = '';
     if (registerPasswordConfirm) registerPasswordConfirm.value = '';
+}
 
 // Show error in modal
 function showModalError(formElement, message) {
@@ -213,6 +208,7 @@ loginForm.addEventListener('submit', async (e) => {
     try {
         await auth.signInWithEmailAndPassword(email, password);
         loginModal.classList.remove('show');
+        clearModalErrors();
         showMessage('✅ Zalogowano pomyślnie!', 'success');
     } catch (error) {
         console.error('Login error:', error);
@@ -254,6 +250,7 @@ registerForm.addEventListener('submit', async (e) => {
     try {
         await auth.createUserWithEmailAndPassword(email, password);
         registerModal.classList.remove('show');
+        clearModalErrors();
         showMessage('✅ Konto utworzone pomyślnie!', 'success');
     } catch (error) {
         console.error('Registration error:', error);
@@ -269,6 +266,7 @@ loginGoogle.addEventListener('click', async () => {
     try {
         await auth.signInWithPopup(googleProvider);
         loginModal.classList.remove('show');
+        clearModalErrors();
         showMessage('✅ Zalogowano przez Google!', 'success');
     } catch (error) {
         console.error('Google login error:', error);
@@ -289,6 +287,7 @@ registerGoogle.addEventListener('click', async () => {
     try {
         await auth.signInWithPopup(googleProvider);
         registerModal.classList.remove('show');
+        clearModalErrors();
         showMessage('✅ Zarejestrowano przez Google!', 'success');
     } catch (error) {
         console.error('Google registration error:', error);
