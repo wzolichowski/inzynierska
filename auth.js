@@ -2,6 +2,9 @@
 
 let currentUser = null;
 
+// Debug
+console.log('auth.js loaded');
+
 // DOM Elements
 const loginModal = document.getElementById('loginModal');
 const registerModal = document.getElementById('registerModal');
@@ -212,6 +215,7 @@ logoutBtn.addEventListener('click', async () => {
 
 // Listen to Auth State Changes
 auth.onAuthStateChanged((user) => {
+    console.log('Auth state changed:', user);
     currentUser = user;
     updateUI();
 });
@@ -221,36 +225,67 @@ function updateUI() {
     const heroSection = document.getElementById('heroSection');
     const uploadSection = document.getElementById('uploadSection');
     
+    console.log('=== updateUI called ===');
+    console.log('currentUser:', currentUser);
+    console.log('heroSection:', heroSection);
+    console.log('uploadSection:', uploadSection);
+    
     if (currentUser) {
         // User is logged in
+        console.log('User is logged in');
+        
         authButtons.style.display = 'none';
         userMenu.style.display = 'flex';
         
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         userGreeting.textContent = `Cześć, ${displayName}!`;
         
-        // Hide hero, show upload
-        if (heroSection) heroSection.style.display = 'none';
-        if (uploadSection) uploadSection.style.display = 'block';
+        // Hide hero, show upload - with !important
+        if (heroSection) {
+            heroSection.style.setProperty('display', 'none', 'important');
+            console.log('✅ Hero section hidden');
+        } else {
+            console.error('❌ heroSection element not found!');
+        }
+        
+        if (uploadSection) {
+            uploadSection.style.setProperty('display', 'block', 'important');
+            console.log('✅ Upload section shown');
+        } else {
+            console.error('❌ uploadSection element not found!');
+        }
     } else {
         // User is logged out
+        console.log('User is logged out');
+        
         authButtons.style.display = 'flex';
         userMenu.style.display = 'none';
         
         // Show hero, hide upload
-        if (heroSection) heroSection.style.display = 'block';
-        if (uploadSection) uploadSection.style.display = 'none';
+        if (heroSection) {
+            heroSection.style.setProperty('display', 'block', 'important');
+            console.log('✅ Hero section shown');
+        }
+        
+        if (uploadSection) {
+            uploadSection.style.setProperty('display', 'none', 'important');
+            console.log('✅ Upload section hidden');
+        }
     }
+    
+    console.log('=== updateUI complete ===');
 }
 
 // Show messages
 function showMessage(message, type) {
     const statusDiv = document.getElementById('status');
-    statusDiv.innerHTML = `<div class="result-section ${type === 'error' ? 'error' : ''}">${message}</div>`;
-    
-    setTimeout(() => {
-        statusDiv.innerHTML = '';
-    }, 5000);
+    if (statusDiv) {
+        statusDiv.innerHTML = `<div class="result-section ${type === 'error' ? 'error' : ''}">${message}</div>`;
+        
+        setTimeout(() => {
+            statusDiv.innerHTML = '';
+        }, 5000);
+    }
 }
 
 // Get user-friendly error messages
@@ -288,3 +323,5 @@ async function getUserToken() {
         return null;
     }
 }
+
+console.log('auth.js fully loaded');
