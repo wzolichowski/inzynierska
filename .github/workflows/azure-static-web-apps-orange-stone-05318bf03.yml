@@ -18,29 +18,20 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-
-      - name: Replace Firebase config placeholders
-        run: |
-          sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_AUTH_DOMAIN%%/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_PROJECT_ID%%/${{ secrets.FIREBASE_PROJECT_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_STORAGE_BUCKET%%/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_MESSAGING_SENDER_ID%%/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_APP_ID%%/${{ secrets.FIREBASE_APP_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
-          mv firebase-config.template.js firebase-config.js
-          echo "✅ firebase-config.js generated with secrets"
-
+          lfs: false
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_STONE_05318BF03 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          app_location: "/"
-          api_location: "api"
-          output_location: ""
+          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
+          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+          app_location: "/" # App source code path
+          api_location: "api" # Api source code path - optional
+          output_location: "." # Built app content directory - optional
+          ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -51,5 +42,5 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_STONE_05318BF03 }}
           action: "close"
