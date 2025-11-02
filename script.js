@@ -31,7 +31,11 @@ if (imageInput) {
 
 // Click on upload area to open file dialog
 if (uploadArea) {
-    uploadArea.addEventListener('click', () => {
+    uploadArea.addEventListener('click', (e) => {
+        // Prevent if clicking on the file input or selected file text
+        if (e.target === imageInput || e.target.closest('.selected-file')) {
+            return;
+        }
         imageInput.click();
     });
 }
@@ -122,6 +126,22 @@ if (uploadButton) {
                 resultsContainer.classList.add('show');
                 statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
                 loadingSpinner.classList.remove('show');
+                
+                // SAVE TO FIRESTORE
+                try {
+                    await db.collection('analyses').add({
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        fileName: file.name,
+                        caption: data.caption || 'No description',
+                        tags: data.tags || [],
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        imagePreview: imagePreview.src
+                    });
+                    console.log('✅ Analiza zapisana do Firestore');
+                } catch (dbError) {
+                    console.error('❌ Błąd zapisu do Firestore:', dbError);
+                }
                 
             } else if (response.status === 401) {
                 showMessage('❌ Sesja wygasła. Proszę zalogować się ponownie.', 'error');
