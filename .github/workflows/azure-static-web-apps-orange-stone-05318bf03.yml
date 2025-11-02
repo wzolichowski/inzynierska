@@ -18,18 +18,18 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-
-      - name: Replace Firebase config placeholders
+          lfs: false
+      
+      - name: Inject Firebase Config
         run: |
-          sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_AUTH_DOMAIN%%/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_PROJECT_ID%%/${{ secrets.FIREBASE_PROJECT_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_STORAGE_BUCKET%%/${{ secrets.FIREBASE_STORAGE_BUCKET }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_MESSAGING_SENDER_ID%%/${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_APP_ID%%/${{ secrets.FIREBASE_APP_ID }}/g" firebase-config.template.js
-          sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
-          mv firebase-config.template.js firebase-config.js
-          echo "✅ firebase-config.js generated with secrets"
+          sed -i 's|%%FIREBASE_API_KEY%%|${{ secrets.FIREBASE_API_KEY }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_AUTH_DOMAIN%%|${{ secrets.FIREBASE_AUTH_DOMAIN }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_PROJECT_ID%%|${{ secrets.FIREBASE_PROJECT_ID }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_STORAGE_BUCKET%%|${{ secrets.FIREBASE_STORAGE_BUCKET }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_MESSAGING_SENDER_ID%%|${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_APP_ID%%|${{ secrets.FIREBASE_APP_ID }}|g' firebase-config.js
+          sed -i 's|%%FIREBASE_MEASUREMENT_ID%%|${{ secrets.FIREBASE_MEASUREMENT_ID }}|g' firebase-config.js
+      
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -40,6 +40,7 @@ jobs:
           app_location: "/"
           api_location: "api"
           output_location: ""
+          skip_app_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
