@@ -11,6 +11,7 @@ const urlsToCache = [
   '/manifest/assets/favicon-32x32.png',
   '/manifest/assets/favicon-16x16.png',
   '/manifest/assets/apple-touch-icon.png',
+  '/manifest/assets/favicon.svg',
   'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js'
 ];
