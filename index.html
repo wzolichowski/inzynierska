@@ -39,7 +39,6 @@
             <button class="btn-nav primary" id="registerBtn">Zarejestruj się</button>
           </div>
           <div id="userMenu" class="user-menu" style="display: none;">
-            <button class="btn-nav" id="historyBtn">📜 Historia</button>
             <span class="user-greeting" id="userGreeting">Cześć!</span>
             <button class="btn-nav danger" id="logoutBtn">Wyloguj</button>
           </div>
@@ -111,24 +110,6 @@
         <p class="modal-footer">
           Masz już konto? <a href="#" id="switchToLogin">Zaloguj się</a>
         </p>
-      </div>
-    </div>
-
-    <!-- History Modal -->
-    <div id="historyModal" class="modal">
-      <div class="modal-content history-modal-content">
-        <span class="close" id="closeHistory">&times;</span>
-        <h2>📜 Historia Analiz</h2>
-        <p class="modal-subtitle">Twoje poprzednie analizy obrazów</p>
-
-        <div id="historyContainer" class="history-container">
-          <div class="loading-spinner show" id="historyLoading"></div>
-          <div id="historyList" class="history-list"></div>
-          <div id="historyEmpty" class="history-empty" style="display: none;">
-            <p>🔍 Brak historii analiz</p>
-            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">Przeanalizuj swoje pierwsze zdjęcie!</p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -278,14 +259,6 @@
       }
     </script>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (TYLKO AUTH - BEZ FIRESTORE) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <script src="firebase-config.js"></script>
-    <script src="auth.js"></script>
-    <script src="history.js"></script>
-    <script src="script.js"></script>
-  </body>
-</html>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script

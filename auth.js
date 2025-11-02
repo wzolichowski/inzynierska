@@ -277,13 +277,8 @@ function updateUI() {
             console.log('✅ Upload shown');
         }
         
-        // Clear and load last analysis
+        // Clear results when switching users
         clearResults();
-        setTimeout(() => {
-            if (typeof loadLastAnalysis === 'function') {
-                loadLastAnalysis();
-            }
-        }, 500);
         
     } else {
         // User is logged out

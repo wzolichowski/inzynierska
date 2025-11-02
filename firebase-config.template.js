@@ -18,13 +18,10 @@ firebase.initializeApp(firebaseConfig);
 // Get Auth instance
 const auth = firebase.auth();
 
-// Get Firestore instance
-const db = firebase.firestore();
-
 // Configure Google Provider
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-console.log('Firebase initialized with Firestore');
+console.log('Firebase initialized');
