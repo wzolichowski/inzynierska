@@ -756,3 +756,21 @@ body {
         width: 100%;
     }
 }
+/* =========================================
+   📝 SELECTED FILE INDICATOR
+========================================= */
+.selected-file {
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.95em;
+    display: none;
+    text-align: center;
+}
+
+.selected-file.show {
+    display: block;
+}

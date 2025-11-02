@@ -151,41 +151,43 @@
           </div>
         </div>
 
-        <!-- Main Upload Area (shown when logged in) -->
+        <!-- Main Upload Area (shown when logged in) - LOOKS EXACTLY LIKE HERO -->
         <div id="uploadSection" style="display: none;">
-          <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📤</div>
-            <label for="imageInput" class="file-label">
-              Kliknij lub przeciągnij obraz
-            </label>
-            <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
-              Obsługiwane formaty: JPG, PNG
-            </p>
-            <input type="file" id="imageInput" accept="image/jpeg, image/png">
-            <div class="selected-file" id="selectedFile"></div>
-          </div>
+          <div class="hero-section">
+            <h2 class="hero-title">Przeanalizuj swoje zdjęcie za pomocą Azure Computer Vision</h2>
 
-          <button id="uploadButton">Analizuj obraz</button>
+            <div class="hero-upload-zone" id="uploadArea">
+              <div class="upload-icon-large">📤</div>
+              <p class="upload-text-main">Kliknij lub przeciągnij obraz</p>
+              <p class="upload-text-sub">JPG, PNG • Max 4MB</p>
+              <input type="file" id="imageInput" accept="image/jpeg, image/png" style="display: none;">
+              <div class="selected-file" id="selectedFile"></div>
+            </div>
 
-          <div class="loading-spinner" id="loadingSpinner"></div>
-          <div id="status"></div>
+            <button id="uploadButton" style="margin-top: 20px; padding: 12px 32px; border: none; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+              Analizuj obraz
+            </button>
 
-          <div class="results-container" id="resultsContainer">
-            <div class="result-section image-preview-section">
-              <h3>Przesłany obraz</h3>
-              <div class="image-preview-container">
-                <img id="imagePreview" src="" alt="Podgląd obrazu">
+            <div class="loading-spinner" id="loadingSpinner" style="margin: 20px auto;"></div>
+            <div id="status" style="margin-top: 20px;"></div>
+
+            <div class="results-container" id="resultsContainer" style="margin-top: 30px;">
+              <div class="result-section image-preview-section">
+                <h3>Przesłany obraz</h3>
+                <div class="image-preview-container">
+                  <img id="imagePreview" src="" alt="Podgląd obrazu">
+                </div>
               </div>
-            </div>
 
-            <div class="result-section">
-              <h3>Opis obrazu</h3>
-              <div class="caption" id="captionText"></div>
-            </div>
+              <div class="result-section">
+                <h3>Opis obrazu</h3>
+                <div class="caption" id="captionText"></div>
+              </div>
 
-            <div class="result-section tags-section">
-              <h3>Wykryte elementy</h3>
-              <div class="tags-container" id="tagsContainer"></div>
+              <div class="result-section tags-section">
+                <h3>Wykryte elementy</h3>
+                <div class="tags-container" id="tagsContainer"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -230,7 +232,6 @@
         e.preventDefault();
         deferredPrompt = e;
         
-        // Show install prompt after 3 seconds
         setTimeout(() => {
           if (!localStorage.getItem('installDismissed')) {
             installPrompt.style.display = 'block';
