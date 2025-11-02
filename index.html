@@ -3,7 +3,25 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analizator Obrazów</title>
+    <title>Analizator Obrazów AI</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/manifest/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/manifest/assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/manifest/assets/apple-touch-icon.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest/manifest.json">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI Vision">
+    
+    <!-- Meta Description -->
+    <meta name="description" content="Analizuj obrazy za pomocą sztucznej inteligencji. Wykrywaj obiekty, generuj opisy i poznaj, co AI widzi na Twoich zdjęciach.">
+    
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -155,6 +173,69 @@
         </div>
       </div>
     </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+      <div class="install-content">
+        <span class="install-icon">📱</span>
+        <div class="install-text">
+          <strong>Zainstaluj aplikację</strong>
+          <p>Dodaj AI Vision do ekranu głównego</p>
+        </div>
+        <div class="install-buttons">
+          <button id="installButton" class="btn-install">Zainstaluj</button>
+          <button id="dismissInstall" class="btn-dismiss">Nie teraz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/manifest/service-worker.js')
+            .then(registration => console.log('✅ Service Worker zarejestrowany:', registration.scope))
+            .catch(error => console.log('❌ Błąd rejestracji Service Worker:', error));
+        });
+      }
+
+      // PWA Install Prompt
+      let deferredPrompt;
+      const installPrompt = document.getElementById('installPrompt');
+      const installButton = document.getElementById('installButton');
+      const dismissInstall = document.getElementById('dismissInstall');
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show install prompt after 3 seconds
+        setTimeout(() => {
+          if (!localStorage.getItem('installDismissed')) {
+            installPrompt.style.display = 'block';
+          }
+        }, 3000);
+      });
+
+      if (installButton) {
+        installButton.addEventListener('click', async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            deferredPrompt = null;
+            installPrompt.style.display = 'none';
+          }
+        });
+      }
+
+      if (dismissInstall) {
+        dismissInstall.addEventListener('click', () => {
+          installPrompt.style.display = 'none';
+          localStorage.setItem('installDismissed', 'true');
+        });
+      }
+    </script>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
