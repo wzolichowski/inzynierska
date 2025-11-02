@@ -1,3 +1,7 @@
+// =========================================
+// script.js
+// =========================================
+
 // Get DOM elements
 const imageInput = document.getElementById('imageInput');
 const uploadButton = document.getElementById('uploadButton');
@@ -222,3 +226,20 @@ if (heroUploadZone && heroImageInput) {
 }
 
 console.log('script.js fully loaded');
+
+// =========================================
+// 🔐 ESC zamykanie modali (login / rejestracja)
+// =========================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const loginModal = document.getElementById('loginModal');
+    const registerModal = document.getElementById('registerModal');
+
+    if (loginModal && loginModal.classList.contains('show')) {
+      loginModal.classList.remove('show');
+    }
+    if (registerModal && registerModal.classList.contains('show')) {
+      registerModal.classList.remove('show');
+    }
+  }
+});
