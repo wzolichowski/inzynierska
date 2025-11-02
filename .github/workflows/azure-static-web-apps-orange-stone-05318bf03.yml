@@ -2,24 +2,24 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches: [ main ]
-
-permissions:
-  contents: read
-  pull-requests: write
+    branches:
+      - main
 
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
+    name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
 
-      # (opcjonalnie) generowanie firebase-config.js
-      - name: Generate firebase-config.js
+      - name: Replace Firebase config placeholders
         run: |
           sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
           sed -i "s/%%FIREBASE_AUTH_DOMAIN%%/${{ secrets.FIREBASE_AUTH_DOMAIN }}/g" firebase-config.template.js
@@ -29,30 +29,27 @@ jobs:
           sed -i "s/%%FIREBASE_APP_ID%%/${{ secrets.FIREBASE_APP_ID }}/g" firebase-config.template.js
           sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
           mv firebase-config.template.js firebase-config.js
+          echo "✅ firebase-config.js generated with secrets"
 
-      # twarda walidacja
-      - name: Validate files
-        run: |
-          ls -la
-          test -f ./index.html || (echo "❌ Brak ./index.html w repo root" && exit 1)
-
-      - name: Deploy to Azure Static Web Apps
+      - name: Build And Deploy
+        id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: upload
-          app_location: "."          # katalog z index.html (root)
-          api_location: ""           # wyłączamy Functions
-          output_location: ""        # bez buildu
-          skip_app_build: true
-          production_branch: "main"
+          action: "upload"
+          app_location: "/"
+          api_location: "api"
+          output_location: ""
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
+    name: Close Pull Request Job
     steps:
-      - uses: Azure/static-web-apps-deploy@v1
+      - name: Close Pull Request
+        id: closepullrequest
+        uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: close
+          action: "close"
