@@ -2,6 +2,7 @@
 
 let currentUser = null;
 
+// Debug
 console.log('auth.js loaded');
 
 // DOM Elements
@@ -94,35 +95,6 @@ function showModalError(formElement, message) {
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
-}
-
-// Clear results and reset UI
-function clearResults() {
-    console.log('Clearing results...');
-    
-    const imagePreview = document.getElementById('imagePreview');
-    if (imagePreview) imagePreview.src = '';
-    
-    const captionText = document.getElementById('captionText');
-    if (captionText) captionText.textContent = '';
-    
-    const tagsContainer = document.getElementById('tagsContainer');
-    if (tagsContainer) tagsContainer.innerHTML = '';
-    
-    const resultsContainer = document.getElementById('resultsContainer');
-    if (resultsContainer) resultsContainer.classList.remove('show');
-    
-    const imageInput = document.getElementById('imageInput');
-    if (imageInput) imageInput.value = '';
-    
-    const selectedFile = document.getElementById('selectedFile');
-    if (selectedFile) {
-        selectedFile.textContent = '';
-        selectedFile.classList.remove('show');
-    }
-    
-    const statusDiv = document.getElementById('status');
-    if (statusDiv) statusDiv.innerHTML = '';
 }
 
 // Email/Password Login
@@ -255,6 +227,8 @@ function updateUI() {
     
     console.log('=== updateUI called ===');
     console.log('currentUser:', currentUser);
+    console.log('heroSection:', heroSection);
+    console.log('uploadSection:', uploadSection);
     
     if (currentUser) {
         // User is logged in
@@ -266,20 +240,20 @@ function updateUI() {
         const displayName = currentUser.displayName || currentUser.email.split('@')[0];
         userGreeting.textContent = `Cześć, ${displayName}!`;
         
-        // Hide hero, show upload
+        // Hide hero, show upload - with !important
         if (heroSection) {
             heroSection.style.setProperty('display', 'none', 'important');
-            console.log('✅ Hero hidden');
+            console.log('✅ Hero section hidden');
+        } else {
+            console.error('❌ heroSection element not found!');
         }
         
         if (uploadSection) {
             uploadSection.style.setProperty('display', 'block', 'important');
-            console.log('✅ Upload shown');
+            console.log('✅ Upload section shown');
+        } else {
+            console.error('❌ uploadSection element not found!');
         }
-        
-        // Clear results when switching users
-        clearResults();
-        
     } else {
         // User is logged out
         console.log('User is logged out');
@@ -290,15 +264,13 @@ function updateUI() {
         // Show hero, hide upload
         if (heroSection) {
             heroSection.style.setProperty('display', 'block', 'important');
-            console.log('✅ Hero shown');
+            console.log('✅ Hero section shown');
         }
         
         if (uploadSection) {
             uploadSection.style.setProperty('display', 'none', 'important');
-            console.log('✅ Upload hidden');
+            console.log('✅ Upload section hidden');
         }
-        
-        clearResults();
     }
     
     console.log('=== updateUI complete ===');

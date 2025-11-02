@@ -31,11 +31,7 @@ if (imageInput) {
 
 // Click on upload area to open file dialog
 if (uploadArea) {
-    uploadArea.addEventListener('click', (e) => {
-        // Prevent if clicking on the file input or selected file text
-        if (e.target === imageInput || e.target.closest('.selected-file')) {
-            return;
-        }
+    uploadArea.addEventListener('click', () => {
         imageInput.click();
     });
 }
