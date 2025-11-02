@@ -59,6 +59,66 @@ switchToLogin.onclick = (e) => {
     clearModalErrors();
 };
 
+switchToLogin.onclick = (e) => {
+    e.preventDefault();
+    registerModal.classList.remove('show');
+    loginModal.classList.add('show');
+    clearModalErrors();
+};
+
+// Forgot Password handler
+const forgotPassword = document.getElementById('forgotPassword');
+if (forgotPassword) {
+    forgotPassword.onclick = async (e) => {
+        e.preventDefault();
+        clearModalErrors();
+        
+        const email = document.getElementById('loginEmail').value;
+        
+        if (!email) {
+            showModalError(loginForm, 'Wprowadź adres email, aby zresetować hasło');
+            return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showModalError(loginForm, 'Wprowadź prawidłowy adres email');
+            return;
+        }
+        
+        try {
+            await auth.sendPasswordResetEmail(email);
+            showModalError(loginForm, '✅ Link do resetowania hasła został wysłany na adres: ' + email);
+            
+            // Success styling
+            const errorDiv = loginForm.parentElement.querySelector('.modal-error');
+            if (errorDiv) {
+                errorDiv.style.background = '#e8f5e9';
+                errorDiv.style.borderColor = '#81c784';
+                errorDiv.style.color = '#2e7d32';
+            }
+            
+            setTimeout(() => {
+                const errorDiv = loginForm.parentElement.querySelector('.modal-error');
+                if (errorDiv) errorDiv.remove();
+            }, 8000);
+            
+        } catch (error) {
+            console.error('Password reset error:', error);
+            let errorMessage = '❌ Nie można wysłać linku resetującego hasło';
+            
+            if (error.code === 'auth/user-not-found') {
+                errorMessage = '❌ Nie znaleziono użytkownika z tym adresem email';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = '❌ Nieprawidłowy adres email';
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = '❌ Zbyt wiele prób. Spróbuj ponownie później';
+            }
+            
+            showModalError(loginForm, errorMessage);
+        }
+    };
+}
 // Close modal when clicking outside
 window.onclick = (e) => {
     if (e.target === loginModal) {
