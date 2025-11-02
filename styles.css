@@ -256,11 +256,28 @@ body {
     z-index: 1001;
 }
 
-.feature-item:hover::before,
-.feature-item:hover::after {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
+/* Desktop - Hover */
+@media (hover: hover) and (pointer: fine) {
+    .feature-item:hover::before,
+    .feature-item:hover::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Mobile - Click/Tap */
+@media (hover: none) or (pointer: coarse) {
+    .feature-item {
+        cursor: pointer;
+    }
+    
+    .feature-item.active::before,
+    .feature-item.active::after {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
 }
 
 /* Responsive */
