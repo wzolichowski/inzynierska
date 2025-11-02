@@ -1,0 +1,11 @@
+{
+  "name": "ai-vision-app",
+  "version": "1.0.0",
+  "description": "AI Image Analysis Application",
+  "scripts": {
+    "build": "echo 'No build needed for static site'"
+  },
+  "keywords": ["azure", "static-web-app", "ai", "vision"],
+  "author": "",
+  "license": "MIT"
+}
