@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html lang="pl">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Analizator Obrazów AI</title>
-    
+
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/manifest/assets/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/manifest/assets/favicon-16x16.png">
-    <link rel="icon" type="image/svg+xml" href="/manifest/assets/favicon.svg">
-    <link rel="apple-touch-icon" sizes="180x180" href="/manifest/assets/apple-touch-icon.png">
-    
+    <link rel="icon" type="image/png" sizes="32x32" href="/manifest/assets/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/manifest/assets/favicon-16x16.png" />
+    <link rel="icon" type="image/svg+xml" href="/manifest/assets/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/manifest/assets/apple-touch-icon.png" />
+
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest/manifest.json">
-    
+    <link rel="manifest" href="/manifest/manifest.json" />
+
     <!-- Theme Color -->
-    <meta name="theme-color" content="#667eea">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AI Vision">
-    
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AI Vision" />
+
     <!-- Meta Description -->
-    <meta name="description" content="Analizuj obrazy za pomocą sztucznej inteligencji. Wykrywaj obiekty, generuj opisy i poznaj, co AI widzi na Twoich zdjęciach.">
-    
-    <link rel="stylesheet" href="styles.css">
+    <meta
+      name="description"
+      content="Analizuj obrazy za pomocą sztucznej inteligencji. Wykrywaj obiekty, generuj opisy i poznaj, co AI widzi na Twoich zdjęciach."
+    />
+
+    <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
       <div class="nav-content">
-        <div class="nav-logo">🤖 AI Vision</div>
+        <div class="nav-logo">
+          <img src="/manifest/assets/favicon.svg" alt="AI Vision Logo" />
+          <span>AI Vision</span>
+        </div>
         <div class="nav-menu">
           <div id="authButtons" class="auth-buttons">
             <button class="btn-nav" id="loginBtn">Zaloguj się</button>
@@ -51,8 +58,8 @@
         <p class="modal-subtitle">Witaj ponownie!</p>
 
         <form id="loginForm">
-          <input type="email" id="loginEmail" placeholder="Email" required>
-          <input type="password" id="loginPassword" placeholder="Hasło" required>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input type="password" id="loginPassword" placeholder="Hasło" required />
           <button type="submit" class="btn-primary">Zaloguj się</button>
         </form>
 
@@ -61,10 +68,33 @@
         <button class="btn-google" id="loginGoogle">
           <span class="google-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92
+                   c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57
+                   c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77
+                   c-.98.66-2.23 1.06-3.71 1.06
+                   -2.86 0-5.29-1.93-6.16-4.53H2.18v2.84
+                   C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09
+                   s.13-1.43.35-2.09V7.07H2.18
+                   C1.43 8.55 1 10.22 1 12
+                   s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15
+                   C17.45 2.09 14.97 1 12 1
+                   7.7 1 3.99 3.47 2.18 7.07l3.66 2.84
+                   c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
             </svg>
           </span>
           Zaloguj przez Google
@@ -84,9 +114,20 @@
         <p class="modal-subtitle">Stwórz nowe konto</p>
 
         <form id="registerForm">
-          <input type="email" id="registerEmail" placeholder="Email" required>
-          <input type="password" id="registerPassword" placeholder="Hasło (min. 6 znaków)" required minlength="6">
-          <input type="password" id="registerPasswordConfirm" placeholder="Powtórz hasło" required>
+          <input type="email" id="registerEmail" placeholder="Email" required />
+          <input
+            type="password"
+            id="registerPassword"
+            placeholder="Hasło (min. 6 znaków)"
+            required
+            minlength="6"
+          />
+          <input
+            type="password"
+            id="registerPasswordConfirm"
+            placeholder="Powtórz hasło"
+            required
+          />
           <button type="submit" class="btn-primary">Zarejestruj się</button>
         </form>
 
@@ -95,10 +136,33 @@
         <button class="btn-google" id="registerGoogle">
           <span class="google-icon">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92
+                   c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57
+                   c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77
+                   c-.98.66-2.23 1.06-3.71 1.06
+                   -2.86 0-5.29-1.93-6.16-4.53H2.18v2.84
+                   C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09
+                   s.13-1.43.35-2.09V7.07H2.18
+                   C1.43 8.55 1 10.22 1 12
+                   s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15
+                   C17.45 2.09 14.97 1 12 1
+                   7.7 1 3.99 3.47 2.18 7.07l3.66 2.84
+                   c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
             </svg>
           </span>
           Zarejestruj przez Google
@@ -125,23 +189,40 @@
             <div class="upload-icon-large">📤</div>
             <p class="upload-text-main">Przeciągnij lub kliknij tutaj</p>
             <p class="upload-text-sub">JPG, PNG • Max 4MB</p>
-            <input type="file" id="heroImageInput" accept="image/jpeg, image/png" style="display: none;">
+            <input
+              type="file"
+              id="heroImageInput"
+              accept="image/jpeg, image/png"
+              style="display: none;"
+            />
           </div>
 
           <div class="features-grid">
-            <div class="feature-item" data-tooltip="AI wykrywa i identyfikuje obiekty, osoby i zwierzęta na zdjęciu z wysoką dokładnością">
+            <div
+              class="feature-item"
+              data-tooltip="AI wykrywa i identyfikuje obiekty, osoby i zwierzęta na zdjęciu z wysoką dokładnością"
+            >
               <span class="feature-icon">🎯</span>
               <span class="feature-text">Detekcja obiektów</span>
             </div>
-            <div class="feature-item" data-tooltip="Automatyczne generowanie opisów obrazu w języku polskim - idealne do dostępności i SEO">
+            <div
+              class="feature-item"
+              data-tooltip="Automatyczne generowanie opisów obrazu w języku polskim - idealne do dostępności i SEO"
+            >
               <span class="feature-icon">💬</span>
               <span class="feature-text">Opis w języku naturalnym</span>
             </div>
-            <div class="feature-item" data-tooltip="Przetwarzanie obrazów w czasie rzeczywistym dzięki Azure Computer Vision API">
+            <div
+              class="feature-item"
+              data-tooltip="Przetwarzanie obrazów w czasie rzeczywistym dzięki Azure Computer Vision API"
+            >
               <span class="feature-icon">⚡</span>
               <span class="feature-text">Błyskawiczna analiza</span>
             </div>
-            <div class="feature-item" data-tooltip="Wydobywanie szczegółowych tagów i metadanych z obrazów - poznaj, co AI widzi">
+            <div
+              class="feature-item"
+              data-tooltip="Wydobywanie szczegółowych tagów i metadanych z obrazów - poznaj, co AI widzi"
+            >
               <span class="feature-icon">🔄</span>
               <span class="feature-text">Reverse engineering obrazu</span>
             </div>
@@ -152,13 +233,9 @@
         <div id="uploadSection" style="display: none;">
           <div class="upload-area" id="uploadArea">
             <div class="upload-icon">📤</div>
-            <label for="imageInput" class="file-label">
-              Kliknij lub przeciągnij obraz
-            </label>
-            <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
-              Obsługiwane formaty: JPG, PNG
-            </p>
-            <input type="file" id="imageInput" accept="image/jpeg, image/png">
+            <label for="imageInput" class="file-label">Kliknij lub przeciągnij obraz</label>
+            <p style="color: #999; font-size: 0.9em; margin-top: 10px;">Obsługiwane formaty: JPG, PNG</p>
+            <input type="file" id="imageInput" accept="image/jpeg, image/png" />
             <div class="selected-file" id="selectedFile"></div>
           </div>
 
@@ -171,7 +248,7 @@
             <div class="result-section image-preview-section">
               <h3>Przesłany obraz</h3>
               <div class="image-preview-container">
-                <img id="imagePreview" src="" alt="Podgląd obrazu">
+                <img id="imagePreview" src="" alt="Podgląd obrazu" />
               </div>
             </div>
 
@@ -209,48 +286,49 @@
 
     <!-- Service Worker Registration -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/manifest/service-worker.js')
-            .then(registration => console.log('✅ Service Worker zarejestrowany:', registration.scope))
-            .catch(error => console.log('❌ Błąd rejestracji Service Worker:', error));
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/manifest/service-worker.js")
+            .then((registration) => console.log("✅ Service Worker zarejestrowany:", registration.scope))
+            .catch((error) => console.log("❌ Błąd rejestracji Service Worker:", error));
         });
       }
 
       // PWA Install Prompt
       let deferredPrompt;
-      const installPrompt = document.getElementById('installPrompt');
-      const installButton = document.getElementById('installButton');
-      const dismissInstall = document.getElementById('dismissInstall');
+      const installPrompt = document.getElementById("installPrompt");
+      const installButton = document.getElementById("installButton");
+      const dismissInstall = document.getElementById("dismissInstall");
 
-      window.addEventListener('beforeinstallprompt', (e) => {
+      window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        
+
         // Show install prompt after 3 seconds
         setTimeout(() => {
-          if (!localStorage.getItem('installDismissed')) {
-            installPrompt.style.display = 'block';
+          if (!localStorage.getItem("installDismissed")) {
+            installPrompt.style.display = "block";
           }
         }, 3000);
       });
 
       if (installButton) {
-        installButton.addEventListener('click', async () => {
+        installButton.addEventListener("click", async () => {
           if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`User response: ${outcome}`);
             deferredPrompt = null;
-            installPrompt.style.display = 'none';
+            installPrompt.style.display = "none";
           }
         });
       }
 
       if (dismissInstall) {
-        dismissInstall.addEventListener('click', () => {
-          installPrompt.style.display = 'none';
-          localStorage.setItem('installDismissed', 'true');
+        dismissInstall.addEventListener("click", () => {
+          installPrompt.style.display = "none";
+          localStorage.setItem("installDismissed", "true");
         });
       }
     </script>
