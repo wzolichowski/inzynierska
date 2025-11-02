@@ -9,16 +9,24 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           submodules: true
-      
+
+      # Jeśli index.html referuje firebase-config.js w tym samym katalogu,
+      # ten krok tworzy plik z sekretów w root repo.
       - name: Replace Firebase config placeholders
         run: |
           sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
@@ -30,17 +38,21 @@ jobs:
           sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
           mv firebase-config.template.js firebase-config.js
           echo "✅ firebase-config.js generated with secrets"
-      
-      - name: Build And Deploy
+
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "/"
-          api_location: "api"
+          action: upload
+          # Katalog z index.html (dla root repo użyj "."; dla np. /site użyj "site")
+          app_location: "."
+          # Brak Functions — zostaw puste lub usuń tę linię
+          api_location: ""
+          # Dla czystego statycznego projektu nie ma katalogu artefaktów
           output_location: ""
+          # Nie budujemy — wgrywamy pliki tak jak są
           skip_app_build: true
 
   close_pull_request_job:
@@ -53,4 +65,4 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: "close"
+          action: close
