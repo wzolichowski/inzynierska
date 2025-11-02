@@ -1,163 +1,167 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analizator Obrazów</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="nav-content">
-            <div class="nav-logo">🤖 AI Vision</div>
-            <div class="nav-menu">
-                <div id="authButtons" class="auth-buttons">
-                    <button class="btn-login" id="loginBtn">Zaloguj się</button>
-                    <button class="btn-register" id="registerBtn">Zarejestruj się</button>
-                </div>
-                <div id="userMenu" class="user-menu" style="display: none;">
-                    <span class="user-greeting" id="userGreeting">Cześć!</span>
-                    <button class="btn-logout" id="logoutBtn">Wyloguj</button>
-                </div>
-            </div>
+      <div class="nav-content">
+        <div class="nav-logo">🤖 AI Vision</div>
+        <div class="nav-menu">
+          <div id="authButtons" class="auth-buttons">
+            <button class="btn-nav" id="loginBtn">Zaloguj się</button>
+            <button class="btn-nav primary" id="registerBtn">Zarejestruj się</button>
+          </div>
+          <div id="userMenu" class="user-menu" style="display: none;">
+            <span class="user-greeting" id="userGreeting">Cześć!</span>
+            <button class="btn-nav danger" id="logoutBtn">Wyloguj</button>
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeLogin">&times;</span>
-            <h2>🔐 Zaloguj się</h2>
-            <p class="modal-subtitle">Witaj ponownie!</p>
-            
-            <form id="loginForm">
-                <input type="email" id="loginEmail" placeholder="Email" required>
-                <input type="password" id="loginPassword" placeholder="Hasło" required>
-                <button type="submit" class="btn-primary">Zaloguj się</button>
-            </form>
+      <div class="modal-content">
+        <span class="close" id="closeLogin">&times;</span>
+        <h2>🔐 Zaloguj się</h2>
+        <p class="modal-subtitle">Witaj ponownie!</p>
 
-            <div class="divider">lub</div>
+        <form id="loginForm">
+          <input type="email" id="loginEmail" placeholder="Email" required>
+          <input type="password" id="loginPassword" placeholder="Hasło" required>
+          <button type="submit" class="btn-primary">Zaloguj się</button>
+        </form>
 
-            <button class="btn-google" id="loginGoogle">
-                <span class="google-icon">G</span>
-                Zaloguj przez Google
-            </button>
+        <div class="divider">lub</div>
 
-            <p class="modal-footer">
-                Nie masz konta? <a href="#" id="switchToRegister">Zarejestruj się</a>
-            </p>
-        </div>
+        <button class="btn-google" id="loginGoogle">
+          <span class="google-icon">G</span>
+          Zaloguj przez Google
+        </button>
+
+        <p class="modal-footer">
+          Nie masz konta? <a href="#" id="switchToRegister">Zarejestruj się</a>
+        </p>
+      </div>
     </div>
 
     <!-- Register Modal -->
     <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeRegister">&times;</span>
-            <h2>📝 Zarejestruj się</h2>
-            <p class="modal-subtitle">Stwórz nowe konto</p>
-            
-            <form id="registerForm">
-                <input type="email" id="registerEmail" placeholder="Email" required>
-                <input type="password" id="registerPassword" placeholder="Hasło (min. 6 znaków)" required minlength="6">
-                <input type="password" id="registerPasswordConfirm" placeholder="Powtórz hasło" required>
-                <button type="submit" class="btn-primary">Zarejestruj się</button>
-            </form>
+      <div class="modal-content">
+        <span class="close" id="closeRegister">&times;</span>
+        <h2>📝 Zarejestruj się</h2>
+        <p class="modal-subtitle">Stwórz nowe konto</p>
 
-            <div class="divider">lub</div>
+        <form id="registerForm">
+          <input type="email" id="registerEmail" placeholder="Email" required>
+          <input type="password" id="registerPassword" placeholder="Hasło (min. 6 znaków)" required minlength="6">
+          <input type="password" id="registerPasswordConfirm" placeholder="Powtórz hasło" required>
+          <button type="submit" class="btn-primary">Zarejestruj się</button>
+        </form>
 
-            <button class="btn-google" id="registerGoogle">
-                <span class="google-icon">G</span>
-                Zarejestruj przez Google
-            </button>
+        <div class="divider">lub</div>
 
-            <p class="modal-footer">
-                Masz już konto? <a href="#" id="switchToLogin">Zaloguj się</a>
-            </p>
-        </div>
+        <button class="btn-google" id="registerGoogle">
+          <span class="google-icon">G</span>
+          Zarejestruj przez Google
+        </button>
+
+        <p class="modal-footer">
+          Masz już konto? <a href="#" id="switchToLogin">Zaloguj się</a>
+        </p>
+      </div>
     </div>
 
     <div class="container">
-        <div class="header">
-            <h1>🤖 Analizator Obrazów AI</h1>
-            <p>Odkryj, co sztuczna inteligencja widzi na Twoich zdjęciach</p>
+      <div class="header">
+        <h1>🤖 Analizator Obrazów AI</h1>
+        <p>Odkryj, co sztuczna inteligencja widzi na Twoich zdjęciach</p>
+      </div>
+
+      <div class="content">
+        <!-- Hero Upload Section (shown when NOT logged in) -->
+        <div id="heroSection" class="hero-section">
+          <h2 class="hero-title">Przeanalizuj swoje zdjęcie w 3 sekundy</h2>
+
+          <div class="hero-upload-zone" id="heroUploadZone">
+            <div class="upload-icon-large">📤</div>
+            <p class="upload-text-main">Przeciągnij lub kliknij tutaj</p>
+            <p class="upload-text-sub">JPG, PNG • Max 4MB</p>
+            <input type="file" id="heroImageInput" accept="image/jpeg, image/png" style="display: none;">
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-item">
+              <span class="feature-icon">🎯</span>
+              <span class="feature-text">Detekcja obiektów</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">💬</span>
+              <span class="feature-text">Opis w języku naturalnym</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">⚡</span>
+              <span class="feature-text">Błyskawiczna analiza</span>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🔄</span>
+              <span class="feature-text">Reverse engineering obrazu</span>
+            </div>
+          </div>
         </div>
 
-        <div class="content">
-            <!-- Hero Upload Section (shown when NOT logged in) -->
-            <div id="heroSection" class="hero-section">
-                <h2 class="hero-title">Przeanalizuj swoje zdjęcie w 3 sekundy</h2>
-                
-                <div class="hero-upload-zone" id="heroUploadZone">
-                    <div class="upload-icon-large">📤</div>
-                    <p class="upload-text-main">Przeciągnij lub kliknij tutaj</p>
-                    <p class="upload-text-sub">JPG, PNG • Max 4MB</p>
-                    <input type="file" id="heroImageInput" accept="image/jpeg, image/png" style="display: none;">
-                </div>
+        <!-- Main Upload Area (shown when logged in) -->
+        <div id="uploadSection" style="display: none;">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📤</div>
+            <label for="imageInput" class="file-label">
+              Kliknij lub przeciągnij obraz
+            </label>
+            <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
+              Obsługiwane formaty: JPG, PNG
+            </p>
+            <input type="file" id="imageInput" accept="image/jpeg, image/png">
+            <div class="selected-file" id="selectedFile"></div>
+          </div>
 
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <span class="feature-icon">🎯</span>
-                        <span class="feature-text">Detekcja obiektów</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">💬</span>
-                        <span class="feature-text">Opis w języku naturalnym</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">⚡</span>
-                        <span class="feature-text">Błyskawiczna analiza</span>
-                    </div>
-                </div>
+          <button id="uploadButton">Analizuj obraz</button>
+
+          <div class="loading-spinner" id="loadingSpinner"></div>
+          <div id="status"></div>
+
+          <div class="results-container" id="resultsContainer">
+            <div class="result-section image-preview-section">
+              <h3>Przesłany obraz</h3>
+              <div class="image-preview-container">
+                <img id="imagePreview" src="" alt="Podgląd obrazu">
+              </div>
             </div>
 
-            <!-- Main Upload Area (shown when logged in) -->
-            <div id="uploadSection" style="display: none;">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📤</div>
-                    <label for="imageInput" class="file-label">
-                        Kliknij lub przeciągnij obraz
-                    </label>
-                    <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
-                        Obsługiwane formaty: JPG, PNG
-                    </p>
-                    <input type="file" id="imageInput" accept="image/jpeg, image/png">
-                    <div class="selected-file" id="selectedFile"></div>
-                </div>
-
-                <button id="uploadButton">Analizuj obraz</button>
-                
-                <div class="loading-spinner" id="loadingSpinner"></div>
-                <div id="status"></div>
-
-                <div class="results-container" id="resultsContainer">
-                    <div class="result-section image-preview-section">
-                        <h3>Przesłany obraz</h3>
-                        <div class="image-preview-container">
-                            <img id="imagePreview" src="" alt="Podgląd obrazu">
-                        </div>
-                    </div>
-
-                    <div class="result-section">
-                        <h3>Opis obrazu</h3>
-                        <div class="caption" id="captionText"></div>
-                    </div>
-
-                    <div class="result-section tags-section">
-                        <h3>Wykryte elementy</h3>
-                        <div class="tags-container" id="tagsContainer"></div>
-                    </div>
-                </div>
+            <div class="result-section">
+              <h3>Opis obrazu</h3>
+              <div class="caption" id="captionText"></div>
             </div>
+
+            <div class="result-section tags-section">
+              <h3>Wykryte elementy</h3>
+              <div class="tags-container" id="tagsContainer"></div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
+
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
