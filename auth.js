@@ -88,7 +88,7 @@ if (forgotPassword) {
         
         try {
             await auth.sendPasswordResetEmail(email);
-            showModalError(loginForm, '✅ Link do resetowania hasła został wysłany na adres: ' + email);
+            showModalError(loginForm, '✅  Jezeli adres email jest zarejestrowany, to za chwilę otrzymasz link na adresie : ' + email);
             
             // Success styling
             const errorDiv = loginForm.parentElement.querySelector('.modal-error');
@@ -131,11 +131,23 @@ window.onclick = (e) => {
     }
 };
 
-// Clear modal errors
+// Clear modal errors AND form fields
 function clearModalErrors() {
     const errorDivs = document.querySelectorAll('.modal-error');
     errorDivs.forEach(div => div.remove());
-}
+    
+    // Clear all form fields
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const registerEmail = document.getElementById('registerEmail');
+    const registerPassword = document.getElementById('registerPassword');
+    const registerPasswordConfirm = document.getElementById('registerPasswordConfirm');
+    
+    if (loginEmail) loginEmail.value = '';
+    if (loginPassword) loginPassword.value = '';
+    if (registerEmail) registerEmail.value = '';
+    if (registerPassword) registerPassword.value = '';
+    if (registerPasswordConfirm) registerPasswordConfirm.value = '';
 
 // Show error in modal
 function showModalError(formElement, message) {
