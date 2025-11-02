@@ -16,13 +16,12 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-
+      
       - name: Generate firebase-config.js from template
         run: |
           sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
@@ -34,25 +33,30 @@ jobs:
           sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
           mv firebase-config.template.js firebase-config.js
           echo "✅ firebase-config.js generated"
-
+      
       - name: Validate static site layout
         run: |
-          echo "PWD: $(pwd)"
+          echo "📁 Checking project structure..."
           ls -la
-          git ls-files | grep -i '^index.html$' || true
-          test -f ./index.html || (echo "❌ Brak ./index.html w app_location=. Zmień app_location albo dodaj plik." && exit 1)
-
+          test -f ./index.html || (echo "❌ Missing index.html" && exit 1)
+          test -f ./styles.css || (echo "❌ Missing styles.css" && exit 1)
+          test -f ./script.js || (echo "❌ Missing script.js" && exit 1)
+          test -f ./auth.js || (echo "❌ Missing auth.js" && exit 1)
+          test -d ./api || (echo "❌ Missing api folder" && exit 1)
+          test -d ./manifest || (echo "❌ Missing manifest folder" && exit 1)
+          echo "✅ All required files present"
+      
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: "."         # katalog z index.html (root)
-          api_location: ""          # brak Functions
-          output_location: ""       # brak buildu/artefaktów
+          app_location: "/"
+          api_location: "api"
+          output_location: ""
           skip_app_build: true
-          production_branch: "main" # wymuś deploy do produkcji
+          skip_api_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
