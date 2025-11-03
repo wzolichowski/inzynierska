@@ -16,6 +16,35 @@ const imagePreview = document.getElementById('imagePreview');
 
 console.log('script.js loaded');
 
+// =========================================
+// 🗜️ KOMPRESJA OBRAZU dla Firestore
+// =========================================
+function compressImage(base64Str, maxWidth = 400) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Konwertuj do JPEG z niższą jakością (70%)
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        img.src = base64Str;
+    });
+}
+
 // File selection handler
 if (imageInput) {
     imageInput.addEventListener('change', (e) => {
@@ -134,8 +163,13 @@ if (uploadButton) {
                 // Store data for image generation
                 storeAnalysisData(data.caption || 'No description', data.tags || []);
                 
-                // SAVE TO FIRESTORE
+                // SAVE TO FIRESTORE z kompresją obrazu
                 try {
+                    console.log('💾 Kompresowanie i zapisywanie do Firestore...');
+                    const compressedImage = await compressImage(imagePreview.src);
+                    console.log(`📦 Oryginalny rozmiar: ${imagePreview.src.length} znaków`);
+                    console.log(`📦 Skompresowany: ${compressedImage.length} znaków`);
+                    
                     await db.collection('analyses').add({
                         userId: currentUser.uid,
                         userEmail: currentUser.email,
@@ -143,11 +177,12 @@ if (uploadButton) {
                         caption: data.caption || 'No description',
                         tags: data.tags || [],
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        imagePreview: imagePreview.src
+                        imagePreview: compressedImage
                     });
                     console.log('✅ Analiza zapisana do Firestore');
                 } catch (dbError) {
                     console.error('❌ Błąd zapisu do Firestore:', dbError);
+                    // Nie blokuj użytkownika - analiza się udała, tylko zapis do historii nie
                 }
                 
             } else if (response.status === 401) {
@@ -247,6 +282,7 @@ let generatedImageUrl = '';
 function storeAnalysisData(caption, tags) {
     currentCaption = caption;
     currentTags = tags;
+    console.log('📊 Zapisano dane do generowania:', { caption, tagsCount: tags.length });
 }
 
 if (generateImageBtn) {
@@ -271,8 +307,12 @@ if (generateImageBtn) {
             
             if (!token) {
                 showMessage('❌ Błąd autoryzacji. Zaloguj się ponownie.', 'error');
+                generateImageBtn.disabled = false;
+                generateLoadingSpinner.classList.remove('show');
                 return;
             }
+
+            console.log('🚀 Wysyłam request do /api/GenerateImage...');
 
             const response = await fetch('/api/GenerateImage', {
                 method: 'POST',
@@ -286,8 +326,11 @@ if (generateImageBtn) {
                 })
             });
 
+            console.log('📡 Response status:', response.status);
+
             if (response.ok) {
                 const data = await response.json();
+                console.log('✅ Otrzymano dane:', data);
                 
                 generatedImageUrl = data.image_url;
                 generatedImagePreview.src = data.image_url;
@@ -307,25 +350,30 @@ if (generateImageBtn) {
             } else if (response.status === 429) {
                 const errorText = await response.text();
                 generateStatus.innerHTML = `<div class="error-message">⏳ ${errorText}</div>`;
+            } else if (response.status === 500) {
+                const errorText = await response.text();
+                console.error('❌ Błąd 500:', errorText);
+                generateStatus.innerHTML = `<div class="error-message">❌ Błąd serwera: ${errorText}<br><small>Sprawdź czy dodałeś klucze Azure OpenAI w Configuration!</small></div>`;
             } else {
                 const errorText = await response.text();
+                console.error('❌ Błąd:', errorText);
                 generateStatus.innerHTML = `<div class="error-message">❌ Błąd: ${errorText}</div>`;
             }
 
         } catch (error) {
-            console.error('Błąd generowania:', error);
+            console.error('❌ Błąd generowania:', error);
             generateStatus.innerHTML = `<div class="error-message">❌ Błąd sieci: ${error.message}</div>`;
         } finally {
             generateImageBtn.disabled = false;
             generateLoadingSpinner.classList.remove('show');
             
-            // Hide status after 5 seconds
+            // Hide status after 8 seconds
             setTimeout(() => {
                 const statusMsg = generateStatus.querySelector('.success-message, .info-message');
                 if (statusMsg) {
                     generateStatus.innerHTML = '';
                 }
-            }, 5000);
+            }, 8000);
         }
     });
 }
@@ -339,6 +387,8 @@ if (downloadGeneratedBtn) {
         }
 
         try {
+            console.log('💾 Pobieranie obrazu...');
+            
             // Fetch the image
             const response = await fetch(generatedImageUrl);
             const blob = await response.blob();
@@ -355,7 +405,7 @@ if (downloadGeneratedBtn) {
             
             showMessage('✅ Obraz został pobrany!', 'success');
         } catch (error) {
-            console.error('Błąd pobierania:', error);
+            console.error('❌ Błąd pobierania:', error);
             alert('Błąd pobierania obrazu. Spróbuj otworzyć w nowej karcie.');
         }
     });
