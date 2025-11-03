@@ -21,7 +21,7 @@ if (imageInput) {
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-            selectedFile.textContent = `📁 ${file.name}`;
+            selectedFile.textContent = `📎 ${file.name}`;
             selectedFile.classList.add('show');
             
             const reader = new FileReader();
@@ -62,7 +62,7 @@ if (uploadArea) {
         const file = e.dataTransfer.files[0];
         if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
             imageInput.files = e.dataTransfer.files;
-            selectedFile.textContent = `📁 ${file.name}`;
+            selectedFile.textContent = `📎 ${file.name}`;
             selectedFile.classList.add('show');
             
             const reader = new FileReader();
@@ -130,6 +130,9 @@ if (uploadButton) {
                 resultsContainer.classList.add('show');
                 statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
                 loadingSpinner.classList.remove('show');
+                
+                // Store data for image generation
+                storeAnalysisData(data.caption || 'No description', data.tags || []);
                 
                 // SAVE TO FIRESTORE
                 try {
@@ -221,6 +224,139 @@ if (heroUploadZone && heroImageInput) {
         if (file) {
             document.getElementById('imageInput').files = heroImageInput.files;
             document.getElementById('uploadButton').click();
+        }
+    });
+}
+
+// =========================================
+// 🎨 REVERSE ENGINEERING - Generate Image
+// =========================================
+const generateImageBtn = document.getElementById('generateImageBtn');
+const generateLoadingSpinner = document.getElementById('generateLoadingSpinner');
+const generateStatus = document.getElementById('generateStatus');
+const generatedImageSection = document.getElementById('generatedImageSection');
+const generatedImagePreview = document.getElementById('generatedImagePreview');
+const generatedPrompt = document.getElementById('generatedPrompt');
+const downloadGeneratedBtn = document.getElementById('downloadGeneratedBtn');
+
+let currentCaption = '';
+let currentTags = [];
+let generatedImageUrl = '';
+
+// Store caption and tags when analysis completes
+function storeAnalysisData(caption, tags) {
+    currentCaption = caption;
+    currentTags = tags;
+}
+
+if (generateImageBtn) {
+    generateImageBtn.addEventListener('click', async () => {
+        if (!currentUser) {
+            showMessage('❌ Musisz być zalogowany, aby generować obrazy!', 'error');
+            return;
+        }
+
+        if (!currentCaption && currentTags.length === 0) {
+            showMessage('❌ Najpierw przeanalizuj obraz!', 'error');
+            return;
+        }
+
+        generateImageBtn.disabled = true;
+        generateLoadingSpinner.classList.add('show');
+        generateStatus.innerHTML = '<div class="info-message">🎨 Generowanie obrazu za pomocą DALL-E 3...<br><small>To może potrwać 10-30 sekund</small></div>';
+        generatedImageSection.style.display = 'none';
+
+        try {
+            const token = await getUserToken();
+            
+            if (!token) {
+                showMessage('❌ Błąd autoryzacji. Zaloguj się ponownie.', 'error');
+                return;
+            }
+
+            const response = await fetch('/api/GenerateImage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    caption: currentCaption,
+                    tags: currentTags
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                generatedImageUrl = data.image_url;
+                generatedImagePreview.src = data.image_url;
+                generatedPrompt.textContent = data.revised_prompt || data.original_prompt;
+                
+                generatedImageSection.style.display = 'block';
+                generateStatus.innerHTML = '<div class="success-message">✅ Obraz wygenerowany pomyślnie!</div>';
+                
+                // Scroll to generated image
+                setTimeout(() => {
+                    generatedImageSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+            } else if (response.status === 401) {
+                showMessage('❌ Sesja wygasła. Proszę zalogować się ponownie.', 'error');
+                await auth.signOut();
+            } else if (response.status === 429) {
+                const errorText = await response.text();
+                generateStatus.innerHTML = `<div class="error-message">⏳ ${errorText}</div>`;
+            } else {
+                const errorText = await response.text();
+                generateStatus.innerHTML = `<div class="error-message">❌ Błąd: ${errorText}</div>`;
+            }
+
+        } catch (error) {
+            console.error('Błąd generowania:', error);
+            generateStatus.innerHTML = `<div class="error-message">❌ Błąd sieci: ${error.message}</div>`;
+        } finally {
+            generateImageBtn.disabled = false;
+            generateLoadingSpinner.classList.remove('show');
+            
+            // Hide status after 5 seconds
+            setTimeout(() => {
+                const statusMsg = generateStatus.querySelector('.success-message, .info-message');
+                if (statusMsg) {
+                    generateStatus.innerHTML = '';
+                }
+            }, 5000);
+        }
+    });
+}
+
+// Download generated image
+if (downloadGeneratedBtn) {
+    downloadGeneratedBtn.addEventListener('click', async () => {
+        if (!generatedImageUrl) {
+            alert('Brak obrazu do pobrania');
+            return;
+        }
+
+        try {
+            // Fetch the image
+            const response = await fetch(generatedImageUrl);
+            const blob = await response.blob();
+            
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-generated-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showMessage('✅ Obraz został pobrany!', 'success');
+        } catch (error) {
+            console.error('Błąd pobierania:', error);
+            alert('Błąd pobierania obrazu. Spróbuj otworzyć w nowej karcie.');
         }
     });
 }
