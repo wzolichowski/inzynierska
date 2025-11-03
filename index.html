@@ -51,7 +51,7 @@
     <div id="loginModal" class="modal">
       <div class="modal-content">
         <span class="close" id="closeLogin">&times;</span>
-        <h2>🔓 Zaloguj się</h2>
+        <h2>🔐 Zaloguj się</h2>
         <p class="modal-subtitle">Witaj ponownie!</p>
 
         <form id="loginForm">
@@ -85,7 +85,7 @@
     <div id="registerModal" class="modal">
       <div class="modal-content">
         <span class="close" id="closeRegister">&times;</span>
-        <h2>🔐 Zarejestruj się</h2>
+        <h2>📝 Zarejestruj się</h2>
         <p class="modal-subtitle">Stwórz nowe konto</p>
 
         <form id="registerForm">
@@ -126,7 +126,7 @@
           <div class="loading-spinner show" id="historyLoading"></div>
           <div id="historyList" class="history-list"></div>
           <div id="historyEmpty" class="history-empty" style="display: none;">
-            <p>📭 Brak historii analiz</p>
+            <p>🔍 Brak historii analiz</p>
             <p style="font-size: 0.9em; color: #999; margin-top: 10px;">Przeanalizuj swoje pierwsze zdjęcie!</p>
           </div>
         </div>
@@ -164,9 +164,9 @@
               <span class="feature-icon">⚡</span>
               <span class="feature-text">Błyskawiczna analiza</span>
             </div>
-            <div class="feature-item" data-tooltip="Generuj nowe obrazy AI na podstawie wykrytych tagów za pomocą DALL-E 3">
-              <span class="feature-icon">🎨</span>
-              <span class="feature-text">Reverse engineering obrazu</span>
+            <div class="feature-item" data-tooltip="TODO - TAGI NA OBRAZ - funkcja w trakcie opracowywania">
+              <span class="feature-icon">🔄</span>
+              <span class="feature-text">TO:DO Reverse engineering obrazu</span>
             </div>
           </div>
         </div>
@@ -207,32 +207,6 @@
               <div class="result-section tags-section">
                 <h3>Wykryte elementy</h3>
                 <div class="tags-container" id="tagsContainer"></div>
-              </div>
-
-              <div class="result-section reverse-engineering-section">
-                <h3>🎨 Reverse Engineering</h3>
-                <p class="section-description">Wygeneruj nowy obraz na podstawie wykrytych elementów</p>
-                <button id="generateImageBtn" class="btn-generate">
-                  <span class="btn-icon">✨</span>
-                  Wygeneruj obraz z tagów
-                </button>
-                <div class="loading-spinner" id="generateLoadingSpinner"></div>
-                <div id="generateStatus"></div>
-              </div>
-
-              <div class="result-section generated-image-section" id="generatedImageSection" style="display: none;">
-                <h3>🎨 Wygenerowany obraz (DALL-E 3)</h3>
-                <div class="image-preview-container">
-                  <img id="generatedImagePreview" src="" alt="Wygenerowany obraz">
-                </div>
-                <div class="generated-prompt">
-                  <strong>Użyty prompt:</strong>
-                  <p id="generatedPrompt"></p>
-                </div>
-                <button id="downloadGeneratedBtn" class="btn-download">
-                  <span class="btn-icon">💾</span>
-                  Pobierz obraz
-                </button>
               </div>
             </div>
           </div>
