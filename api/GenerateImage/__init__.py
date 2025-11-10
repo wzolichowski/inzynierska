@@ -79,9 +79,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         user_info = verify_firebase_token(token)
 
         if not user_info:
-            logging.warning("Invalid or expired token - SKIPPING FOR TEST")
-            user_info = {"email": "test@test.com", "localId": "test123"} 
-            
+            logging.warning("Invalid or expired token")
+            return func.HttpResponse(
+                "Unauthorized: Invalid or expired token. Please log in.",
+                status_code=401
+            )
     else:
         return func.HttpResponse(
             "Unauthorized: No authentication token provided.",
