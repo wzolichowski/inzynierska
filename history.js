@@ -1,6 +1,6 @@
 // History Management
 
-console.log('history.js loaded');
+console.log('history.js loaded'); 
 
 // DOM Elements
 const historyBtn = document.getElementById('historyBtn');
