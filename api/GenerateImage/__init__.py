@@ -67,8 +67,35 @@ def verify_firebase_token(token):
         return None
 
 
+def _cors_response(body='', status=200):
+    """Return HttpResponse with standard CORS headers applied."""
+    headers = {
+        # In production set specific origin instead of '*'
+        "Access-Control-Allow-Origin": os.environ.get("CORS_ALLOW_ORIGIN", "*"),
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+        "Access-Control-Allow-Credentials": "true"
+    }
+    # body may be a dict or string
+    if isinstance(body, (dict, list)):
+        body_text = json.dumps(body, ensure_ascii=False)
+    else:
+        body_text = body or ""
+    return func.HttpResponse(
+        body=body_text,
+        status_code=status,
+        headers=headers,
+        mimetype="application/json"
+    )
+
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('DALL-E 3 Image Generation function triggered.')
+
+    # Handle CORS preflight
+    if req.method == "OPTIONS":
+        # 204 No Content for preflight
+        return _cors_response('', status=204)
 
     # Verify Firebase token (required for image generation)
     auth_header = req.headers.get('Authorization')
@@ -77,20 +104,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if auth_header and auth_header.startswith('Bearer '):
         token = auth_header.split(' ')[1]
         user_info = verify_firebase_token(token)
-
-        if not user_info:
-            logging.warning("Invalid or expired token")
-            return func.HttpResponse(
-                "Unauthorized: Invalid or expired token. Please log in.",
-                status_code=401
-            )
     else:
-        return func.HttpResponse(
-            "Unauthorized: No authentication token provided.",
-            status_code=401
-        )
+        logging.info("No Authorization header present in request")
 
-    # Validate environment variables
+    # Allow skipping auth for tests/staging using an env var
+    skip_auth = os.environ.get("SKIP_AUTH_FOR_TESTS", "false").lower() == "true"
+    if not user_info:
+        if skip_auth:
+            logging.warning("Invalid or expired token - SKIPPING FOR TEST (SKIP_AUTH_FOR_TESTS=true)")
+            user_info = {"email": "test@test.com", "localId": "test123"}
+        else:
+            return _cors_response({"error": "Unauthorized: Invalid or expired token. Please log in."}, status=401)
+
+    # Validate environment variables for Azure OpenAI
     try:
         AZURE_OPENAI_KEY = os.environ["AZURE_OPENAI_KEY"]
         AZURE_OPENAI_ENDPOINT = os.environ["AZURE_OPENAI_ENDPOINT"]
@@ -102,10 +128,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     except (KeyError, ValueError) as e:
         logging.error(f"CRITICAL ERROR: Missing Azure OpenAI configuration. {e}")
-        return func.HttpResponse(
-             "Server error: Azure OpenAI keys not configured.",
-             status_code=500
-        )
+        return _cors_response({"error": "Server error: Azure OpenAI keys not configured."}, status=500)
 
     # Get prompt from request
     try:
@@ -116,31 +139,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         style = req_body.get('style', 'vivid')  # vivid or natural
 
     except ValueError:
-        return func.HttpResponse(
-            "Invalid JSON in request body.",
-            status_code=400
-        )
+        return _cors_response({"error": "Invalid JSON in request body."}, status=400)
 
     # Validate prompt
     if not prompt:
-        return func.HttpResponse(
-            "No prompt provided. Please provide a 'prompt' field.",
-            status_code=400
-        )
+        return _cors_response({"error": "No prompt provided. Please provide a 'prompt' field."}, status=400)
 
     if len(prompt) > MAX_PROMPT_LENGTH:
-        return func.HttpResponse(
-            f"Prompt too long. Maximum length: {MAX_PROMPT_LENGTH} characters.",
-            status_code=400
-        )
+        return _cors_response({"error": f"Prompt too long. Maximum length: {MAX_PROMPT_LENGTH} characters."}, status=400)
 
     # Validate size
     valid_sizes = ['1024x1024', '1792x1024', '1024x1792']
     if size not in valid_sizes:
-        return func.HttpResponse(
-            f"Invalid size. Allowed sizes: {', '.join(valid_sizes)}",
-            status_code=400
-        )
+        return _cors_response({"error": f"Invalid size. Allowed sizes: {', '.join(valid_sizes)}"}, status=400)
 
     # Generate image with DALL-E 3
     try:
@@ -180,23 +191,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         logging.info(f"Image generated successfully for user: {user_info.get('email')}")
 
-        return func.HttpResponse(
-            body=json.dumps(response_data, ensure_ascii=False),
-            status_code=200,
-            mimetype="application/json"
-        )
+        return _cors_response(response_data, status=200)
 
     except Exception as e:
         logging.error(f"ERROR DURING IMAGE GENERATION: {type(e).__name__}: {str(e)}", exc_info=True)
 
         error_message = str(e)
         if "content_policy_violation" in error_message.lower():
-            return func.HttpResponse(
-                "Content policy violation: Your prompt was rejected by the safety system.",
-                status_code=400
-            )
+            return _cors_response({"error": "Content policy violation: Your prompt was rejected by the safety system."}, status=400)
 
-        return func.HttpResponse(
-            "Error during image generation. Please try again.",
-            status_code=500
-        )
+        return _cors_response({"error": "Error during image generation. Please try again."}, status=500)
