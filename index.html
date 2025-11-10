@@ -164,9 +164,9 @@
               <span class="feature-icon">⚡</span>
               <span class="feature-text">Błyskawiczna analiza</span>
             </div>
-            <div class="feature-item" data-tooltip="TODO - TAGI NA OBRAZ - funkcja w trakcie opracowywania">
-              <span class="feature-icon">🔄</span>
-              <span class="feature-text">TO:DO Reverse engineering obrazu</span>
+            <div class="feature-item" data-tooltip="Po analizie obrazu możesz wygenerować nowy obraz AI na podstawie wykrytych elementów">
+              <span class="feature-icon">🎨</span>
+              <span class="feature-text">Generuj obraz z tagów</span>
             </div>
           </div>
         </div>
@@ -207,6 +207,101 @@
               <div class="result-section tags-section">
                 <h3>Wykryte elementy</h3>
                 <div class="tags-container" id="tagsContainer"></div>
+                
+                <!-- Generate Image from Tags Section -->
+                <div class="generate-from-tags-section" id="generateFromTagsSection" style="display: none; margin-top: 30px;">
+                  <div class="divider-with-text">
+                    <span>🎨 Generuj nowy obraz z AI</span>
+                  </div>
+                  
+                  <p class="generate-hint">Wygeneruj nowy obraz używając wykrytych elementów jako inspiracji</p>
+                  
+                  <div class="prompt-preview-container">
+                    <label for="promptPreview" class="prompt-preview-label">Prompt dla DALL-E 3:</label>
+                    <textarea 
+                      id="promptPreview" 
+                      class="prompt-preview" 
+                      rows="3"
+                      placeholder="Edytuj prompt przed generowaniem..."
+                    ></textarea>
+                    <p class="prompt-hint">💡 Możesz edytować prompt przed wygenerowaniem obrazu</p>
+                  </div>
+
+                  <div class="generation-options-compact">
+                    <div class="option-group">
+                      <label for="sizeSelect">📐 Rozmiar:</label>
+                      <select id="sizeSelect" class="option-select">
+                        <option value="1024x1024" selected>Kwadrat (1024x1024)</option>
+                        <option value="1792x1024">Panorama (1792x1024)</option>
+                        <option value="1024x1792">Portret (1024x1792)</option>
+                      </select>
+                    </div>
+
+                    <div class="option-group">
+                      <label for="qualitySelect">✨ Jakość:</label>
+                      <select id="qualitySelect" class="option-select">
+                        <option value="standard" selected>Standard (~$0.04)</option>
+                        <option value="hd">HD (~$0.08)</option>
+                      </select>
+                    </div>
+
+                    <div class="option-group">
+                      <label for="styleSelect">🎨 Styl:</label>
+                      <select id="styleSelect" class="option-select">
+                        <option value="vivid" selected>Żywy</option>
+                        <option value="natural">Naturalny</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button id="generateFromTagsBtn" class="btn-generate-from-tags">
+                    <span class="btn-icon">🎨</span>
+                    <span class="btn-text">Wygeneruj obraz z DALL-E 3</span>
+                  </button>
+
+                  <div class="loading-spinner" id="generateLoadingSpinner"></div>
+                  <div id="generateStatus"></div>
+
+                  <!-- Generated Image Display -->
+                  <div class="generated-image-result" id="generatedImageResult" style="display: none;">
+                    <div class="result-divider"></div>
+                    <h3>🎉 Wygenerowany obraz AI</h3>
+                    
+                    <div class="image-comparison">
+                      <div class="image-comparison-item">
+                        <p class="comparison-label">📸 Oryginalny obraz</p>
+                        <div class="comparison-image-wrapper">
+                          <img id="originalImagePreview" src="" alt="Oryginalny obraz">
+                        </div>
+                      </div>
+                      
+                      <div class="image-comparison-arrow">→</div>
+                      
+                      <div class="image-comparison-item">
+                        <p class="comparison-label">🎨 Wygenerowany przez AI</p>
+                        <div class="comparison-image-wrapper">
+                          <img id="generatedImage" src="" alt="Wygenerowany obraz">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="revised-prompt-section" id="revisedPromptSection" style="display: none;">
+                      <p class="revised-prompt-label">📝 Zmodyfikowany prompt AI:</p>
+                      <p class="revised-prompt-text" id="revisedPromptText"></p>
+                    </div>
+
+                    <div class="generated-actions">
+                      <button id="downloadGeneratedBtn" class="btn-download">
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">Pobierz wygenerowany obraz</span>
+                      </button>
+                      <button id="generateAgainBtn" class="btn-secondary">
+                        <span class="btn-icon">🔄</span>
+                        <span class="btn-text">Wygeneruj ponownie</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -287,6 +382,7 @@
     <script src="firebase-config.js"></script>
     <script src="auth.js"></script>
     <script src="history.js"></script>
+    <script src="image-generator.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

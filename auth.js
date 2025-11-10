@@ -190,6 +190,16 @@ function clearResults() {
     
     const statusDiv = document.getElementById('status');
     if (statusDiv) statusDiv.innerHTML = '';
+    
+    // Clear generation section
+    const generateFromTagsSection = document.getElementById('generateFromTagsSection');
+    if (generateFromTagsSection) generateFromTagsSection.style.display = 'none';
+    
+    const generatedImageResult = document.getElementById('generatedImageResult');
+    if (generatedImageResult) generatedImageResult.style.display = 'none';
+    
+    const promptPreview = document.getElementById('promptPreview');
+    if (promptPreview) promptPreview.value = '';
 }
 
 // Email/Password Login

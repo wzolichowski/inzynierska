@@ -16,6 +16,9 @@ const imagePreview = document.getElementById('imagePreview');
 
 console.log('script.js loaded');
 
+// Store current analysis data
+let currentAnalysisData = null;
+
 // File selection handler
 if (imageInput) {
     imageInput.addEventListener('change', (e) => {
@@ -97,6 +100,12 @@ if (uploadButton) {
         loadingSpinner.classList.add('show');
         statusDiv.textContent = '🔄 Analizowanie obrazu...';
         resultsContainer.classList.remove('show');
+        
+        // Hide generation section
+        const generateFromTagsSection = document.getElementById('generateFromTagsSection');
+        if (generateFromTagsSection) {
+            generateFromTagsSection.style.display = 'none';
+        }
 
         try {
             const token = await getUserToken();
@@ -115,11 +124,18 @@ if (uploadButton) {
             if (response.ok) {
                 const data = await response.json();
                 
-                captionText.textContent = data.caption || 'No description';
+                // Store analysis data
+                currentAnalysisData = {
+                    caption: data.caption || 'No description',
+                    tags: data.tags || [],
+                    fileName: file.name,
+                    imagePreview: imagePreview.src
+                };
+                
+                captionText.textContent = currentAnalysisData.caption;
 
                 tagsContainer.innerHTML = '';
-                const tags = data.tags || [];
-                tags.forEach((tag, index) => {
+                currentAnalysisData.tags.forEach((tag, index) => {
                     const tagElement = document.createElement('div');
                     tagElement.className = 'tag';
                     tagElement.textContent = tag;
@@ -131,14 +147,17 @@ if (uploadButton) {
                 statusDiv.textContent = '✅ Analiza zakończona pomyślnie!';
                 loadingSpinner.classList.remove('show');
                 
+                // Show "Generate from tags" section
+                showGenerateFromTagsSection();
+                
                 // SAVE TO FIRESTORE
                 try {
                     await db.collection('analyses').add({
                         userId: currentUser.uid,
                         userEmail: currentUser.email,
                         fileName: file.name,
-                        caption: data.caption || 'No description',
-                        tags: data.tags || [],
+                        caption: currentAnalysisData.caption,
+                        tags: currentAnalysisData.tags,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         imagePreview: imagePreview.src
                     });
@@ -164,6 +183,52 @@ if (uploadButton) {
             uploadButton.disabled = false;
         }
     });
+}
+
+// Show "Generate from tags" section
+function showGenerateFromTagsSection() {
+    const generateFromTagsSection = document.getElementById('generateFromTagsSection');
+    const promptPreview = document.getElementById('promptPreview');
+    
+    if (!generateFromTagsSection || !currentAnalysisData) return;
+    
+    // Create prompt from tags and caption
+    const prompt = createPromptFromAnalysis(currentAnalysisData);
+    promptPreview.value = prompt;
+    
+    // Show section with animation
+    generateFromTagsSection.style.display = 'block';
+    setTimeout(() => {
+        generateFromTagsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+    
+    console.log('✅ Generate from tags section shown');
+}
+
+// Create prompt from analysis data
+function createPromptFromAnalysis(data) {
+    // Use caption as base, add top tags for detail
+    const topTags = data.tags.slice(0, 5).join(', ');
+    
+    let prompt = '';
+    
+    // If we have a good caption, use it
+    if (data.caption && data.caption !== 'No description') {
+        prompt = data.caption;
+        
+        // Add some tags for more detail
+        if (topTags) {
+            prompt += `, featuring ${topTags}`;
+        }
+    } else {
+        // If no caption, create from tags
+        prompt = `An image with ${topTags}`;
+    }
+    
+    // Add style instructions for better results
+    prompt += ', photorealistic, high quality, detailed';
+    
+    return prompt;
 }
 
 // Hero upload zone handler

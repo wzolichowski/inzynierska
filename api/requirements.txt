@@ -2,3 +2,6 @@ azure-functions
 msrestazure
 azure-cognitiveservices-vision-computervision
 firebase
+requests
+msrest
+openai>=1.0.0
