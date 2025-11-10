@@ -1,6 +1,7 @@
 import logging
 import os
 import json
+import base64
 import azure.functions as func
 import requests
 from openai import AzureOpenAI
@@ -19,6 +20,21 @@ def verify_firebase_token(token):
 
         # ensure no stray whitespace/newlines
         token = token.strip()
+
+        # --- decode header to detect alg (quick check) ---
+        try:
+            hdr_b64 = token.split('.')[0]
+            hdr_b64 += '=' * (-len(hdr_b64) % 4)
+            hdr_json = base64.urlsafe_b64decode(hdr_b64.encode('utf-8'))
+            hdr = json.loads(hdr_json)
+            alg = hdr.get('alg', '').upper()
+            logging.info(f"🔍 Token header alg: {alg}")
+            if alg.startswith('HS'):
+                logging.warning("🚫 Detected HS-signed JWT (likely not a Firebase idToken). Aborting verification.")
+                # Return special object to indicate invalid token type (handled by main)
+                return {"_invalid_token_type": True, "alg": alg}
+        except Exception:
+            logging.info("🔍 Could not decode token header — continuing to verification (may still fail).")
 
         firebase_project_id = os.environ.get("FIREBASE_PROJECT_ID")
         firebase_api_key = os.environ.get("FIREBASE_API_KEY")
@@ -115,6 +131,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         token = auth_header.split(' ', 1)[1].strip()
         logging.info(f"DEBUG: token snippet backend: {token[:60]}...")
         user_info = verify_firebase_token(token)
+
+        # If verify returned special dict saying token type invalid, return helpful error
+        if isinstance(user_info, dict) and user_info.get('_invalid_token_type'):
+            return _cors_response({
+                "error": "INVALID_TOKEN_TYPE",
+                "message": "Received HS-signed JWT (not a Firebase idToken). Ensure you send Firebase idToken obtained via getIdToken()."
+            }, status=401)
+
     else:
         logging.info("No (valid) Authorization header present in request")
 
