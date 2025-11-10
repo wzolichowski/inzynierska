@@ -167,8 +167,9 @@ if (uploadButton) {
                 }
                 
             } else if (response.status === 401) {
-                showMessage('❌ Sesja wygasła. Proszę zalogować się ponownie.', 'error');
-                await auth.signOut();
+                showMessage('❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Configuration.', 'error');
+                console.error('401 Unauthorized - sprawdź Application Settings w Azure Portal');
+                // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
             } else {
                 const errorText = await response.text();
                 statusDiv.innerHTML = `<div class="result-section error">❌ Błąd: ${errorText}</div>`;

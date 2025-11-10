@@ -119,8 +119,10 @@ if (generateFromTagsBtn) {
                 }
                 
             } else if (response.status === 401) {
-                showGenerateMessage('❌ Sesja wygasła. Proszę zalogować się ponownie.', 'error');
-                await auth.signOut();
+                showGenerateMessage('❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Static Web App Configuration.', 'error');
+                console.error('401 Unauthorized - sprawdź Application Settings w Azure Portal');
+                // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
+                // await auth.signOut();
             } else {
                 const errorText = await response.text();
                 showGenerateMessage(`❌ Błąd: ${errorText}`, 'error');
