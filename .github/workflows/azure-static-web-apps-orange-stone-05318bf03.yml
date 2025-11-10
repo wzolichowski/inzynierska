@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
-
+          
       - name: Replace Firebase config placeholders
         run: |
           sed -i "s/%%FIREBASE_API_KEY%%/${{ secrets.FIREBASE_API_KEY }}/g" firebase-config.template.js
@@ -30,7 +30,7 @@ jobs:
           sed -i "s/%%FIREBASE_MEASUREMENT_ID%%/${{ secrets.FIREBASE_MEASUREMENT_ID }}/g" firebase-config.template.js
           mv firebase-config.template.js firebase-config.js
           echo "✅ firebase-config.js generated with secrets"
-
+          
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -42,16 +42,17 @@ jobs:
           api_location: "api"
           output_location: ""
         env:
-          # Azure Computer Vision (istniejące)
+          # Azure Computer Vision
           AI_VISION_KEY: ${{ secrets.AI_VISION_KEY }}
           AI_VISION_ENDPOINT: ${{ secrets.AI_VISION_ENDPOINT }}
           
-          # Azure OpenAI - DALL-E 3 (NOWE!)
+          # Azure OpenAI - DALL-E 3
           AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
           AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-          AZURE_OPENAI_API_VERSION: "2024-02-01"
+          AZURE_OPENAI_DALLE_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DALLE_DEPLOYMENT }}
+          AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION }}
           
-          # Firebase (istniejące)
+          # Firebase
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
