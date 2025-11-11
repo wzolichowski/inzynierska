@@ -111,23 +111,32 @@ function createHistoryItem(docId, data) {
     const tagsHTML = tags.map(tag => `<span class="history-tag">${tag}</span>`).join('');
     const moreTags = data.tags && data.tags.length > 5 ? `<span class="history-tag">+${data.tags.length - 5}</span>` : '';
 
-    item.innerHTML = `
-        <div class="history-item-header">
-            <div class="history-item-icon">📸</div>
-            <div class="history-item-info">
-                <div class="history-item-filename">${data.fileName || 'Unknown file'}</div>
-                <div class="history-item-date">${formattedDate}</div>
-            </div>
+    // Image preview (if available)
+    const imageHTML = data.imagePreview ? `
+        <div class="history-item-image">
+            <img src="${data.imagePreview}" alt="${data.fileName || 'Preview'}">
         </div>
-        <div class="history-item-caption">${data.caption || 'No description'}</div>
-        <div class="history-item-tags">${tagsHTML}${moreTags}</div>
-        <div class="history-item-actions">
-            <button class="btn-history-view" onclick="viewHistoryItem('${docId}')">
-                <span>👁️</span> Zobacz
-            </button>
-            <button class="btn-history-delete" onclick="deleteHistoryItem('${docId}')">
-                <span>🗑️</span>
-            </button>
+    ` : '';
+
+    item.innerHTML = `
+        ${imageHTML}
+        <div class="history-item-content">
+            <div class="history-item-header">
+                <div class="history-item-info">
+                    <div class="history-item-filename">${data.fileName || 'Unknown file'}</div>
+                    <div class="history-item-date">${formattedDate}</div>
+                </div>
+            </div>
+            <div class="history-item-caption">${data.caption || 'No description'}</div>
+            <div class="history-item-tags">${tagsHTML}${moreTags}</div>
+            <div class="history-item-actions">
+                <button class="btn-history-view" onclick="viewHistoryItem('${docId}')">
+                    <span>👁️</span> Zobacz
+                </button>
+                <button class="btn-history-delete" onclick="deleteHistoryItem('${docId}')">
+                    <span>🗑️</span>
+                </button>
+            </div>
         </div>
     `;
 
