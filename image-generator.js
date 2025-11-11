@@ -1,4 +1,5 @@
 // DALL-E 3 Image Generator - Generate from Tags
+// FIXED: Token sent in both header AND body for reliability
 
 console.log('image-generator.js loaded');
 
@@ -47,13 +48,40 @@ if (generateFromTagsBtn) {
         try {
             const token = await getUserToken();
             
+            // Validate token before sending
+            console.log('=== TOKEN DEBUG ===');
+            console.log('Token length:', token ? token.length : 0);
+            console.log('Token starts with eyJ:', token ? token.startsWith('eyJ') : false);
+            
+            if (!token) {
+                showGenerateMessage('❌ Nie można pobrać tokenu autoryzacji!', 'error');
+                generateFromTagsBtn.disabled = false;
+                generateLoadingSpinner.classList.remove('show');
+                return;
+            }
+            
+            if (token.length < 500) {
+                console.error('❌ Token too short:', token.length);
+                showGenerateMessage('❌ Token autoryzacji jest nieprawidłowy. Zaloguj się ponownie.', 'error');
+                generateFromTagsBtn.disabled = false;
+                generateLoadingSpinner.classList.remove('show');
+                return;
+            }
+            
+            console.log('✅ Token validated, sending request...');
+            console.log('Authorization header length:', `Bearer ${token}`.length);
+            console.log('==================');
+            
+            // IMPORTANT: Send token in BOTH header AND body
+            // Some proxies/CDNs truncate long headers
             const response = await fetch('/api/GenerateImage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`  // Primary method
                 },
                 body: JSON.stringify({
+                    token: token,  // Backup method (in body)
                     prompt: prompt,
                     size: sizeSelect.value,
                     quality: qualitySelect.value,
@@ -121,8 +149,6 @@ if (generateFromTagsBtn) {
             } else if (response.status === 401) {
                 showGenerateMessage('❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Static Web App Configuration.', 'error');
                 console.error('401 Unauthorized - sprawdź Application Settings w Azure Portal');
-                // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
-                // await auth.signOut();
             } else {
                 const errorText = await response.text();
                 showGenerateMessage(`❌ Błąd: ${errorText}`, 'error');

@@ -17,6 +17,7 @@ def verify_firebase_token(token):
         logging.info(f"🔍 Starting token verification...")
         logging.info(f"🔑 Firebase Project ID: {firebase_project_id}")
         logging.info(f"🔑 Firebase API Key present: {'Yes' if firebase_api_key else 'No'}")
+        logging.info(f"🔑 Token length received: {len(token) if token else 0}")
         
         if not firebase_project_id:
             logging.warning("❌ Firebase project ID not configured")
@@ -26,13 +27,17 @@ def verify_firebase_token(token):
             logging.warning("❌ Firebase API key not configured")
             return None
         
+        if not token or len(token) < 500:
+            logging.error(f"❌ Token too short or empty: {len(token) if token else 0} chars")
+            return None
+        
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={firebase_api_key}"
-        logging.info(f"📡 Calling Firebase API: {url[:80]}...")
+        logging.info(f"📡 Calling Firebase API...")
         
         response = requests.post(
             url,
             json={"idToken": token},
-            timeout=10  # Zwiększony timeout
+            timeout=10
         )
         
         logging.info(f"📥 Firebase API response status: {response.status_code}")
@@ -48,7 +53,7 @@ def verify_firebase_token(token):
                 logging.warning("❌ No users found in response")
         else:
             logging.error(f"❌ Firebase API error: {response.status_code}")
-            logging.error(f"❌ Response body: {response.text[:500]}")  # First 500 chars
+            logging.error(f"❌ Response body: {response.text[:500]}")
         
         return None
         
@@ -62,25 +67,53 @@ def verify_firebase_token(token):
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('🎨 DALL-E 3 Image Generation function triggered.')
 
-    # Verify Firebase token (required for image generation)
+    # IMPORTANT: Try to get token from BOTH header AND body
+    # Some proxies/CDNs truncate long headers
     auth_header = req.headers.get('Authorization')
-    user_info = None
+    token = None
+    token_source = None
     
+    # Method 1: Try header first (standard)
     if auth_header and auth_header.startswith('Bearer '):
         token = auth_header.split(' ')[1]
-        logging.info(f"🔐 Auth header present, token length: {len(token)}")
-        user_info = verify_firebase_token(token)
-        
-        if not user_info:
-            logging.warning("❌ Invalid or expired token")
-            return func.HttpResponse(
-                "Unauthorized: Invalid or expired token. Please log in.",
-                status_code=401
-            )
-    else:
-        logging.warning("❌ No authentication token provided")
+        token_source = "header"
+        logging.info(f"🔐 Got token from Authorization header, length: {len(token)}")
+    
+    # Method 2: If header token is too short, try body (backup)
+    if not token or len(token) < 500:
+        try:
+            req_body = req.get_json()
+            body_token = req_body.get('token')
+            if body_token and len(body_token) > len(token if token else ''):
+                token = body_token
+                token_source = "body"
+                logging.info(f"🔐 Using token from request body instead, length: {len(token)}")
+        except:
+            pass
+    
+    if not token:
+        logging.warning("❌ No authentication token provided in header or body")
         return func.HttpResponse(
             "Unauthorized: No authentication token provided.",
+            status_code=401
+        )
+    
+    if len(token) < 500:
+        logging.error(f"❌ Token too short from {token_source}: {len(token)} chars (expected ~800-1500)")
+        return func.HttpResponse(
+            "Unauthorized: Invalid token format (token too short).",
+            status_code=401
+        )
+    
+    logging.info(f"✅ Token validated from {token_source}, length: {len(token)}")
+    
+    # Verify Firebase token
+    user_info = verify_firebase_token(token)
+    
+    if not user_info:
+        logging.warning("❌ Invalid or expired token")
+        return func.HttpResponse(
+            "Unauthorized: Invalid or expired token. Please log in.",
             status_code=401
         )
     
@@ -113,9 +146,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
         prompt = req_body.get('prompt', '').strip()
-        size = req_body.get('size', '1024x1024')  # Default size
-        quality = req_body.get('quality', 'standard')  # standard or hd
-        style = req_body.get('style', 'vivid')  # vivid or natural
+        size = req_body.get('size', '1024x1024')
+        quality = req_body.get('quality', 'standard')
+        style = req_body.get('style', 'vivid')
         
         logging.info(f"📝 Request params:")
         logging.info(f"   Prompt length: {len(prompt)}")
