@@ -246,7 +246,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.warning(f"⚠️ Content policy violation for prompt: {prompt[:100]}")
             return func.HttpResponse(
                 "Content policy violation: Your prompt was rejected by the safety system.",
-                status_code=400
+                status_code=400 
             )
         
         return func.HttpResponse(
