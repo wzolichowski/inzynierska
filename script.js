@@ -2,6 +2,26 @@
 // script.js
 // =========================================
 
+// Clear results on page load/refresh
+window.addEventListener('load', () => {
+    const resultsContainer = document.getElementById('resultsContainer');
+    const generateFromTagsSection = document.getElementById('generateFromTagsSection');
+    const generatedImageResult = document.getElementById('generatedImageResult');
+    
+    // Hide all result sections
+    if (resultsContainer) {
+        resultsContainer.classList.remove('show');
+    }
+    if (generateFromTagsSection) {
+        generateFromTagsSection.style.display = 'none';
+    }
+    if (generatedImageResult) {
+        generatedImageResult.style.display = 'none';
+    }
+    
+    console.log('✅ Results cleared on page load');
+});
+
 // Get DOM elements
 const imageInput = document.getElementById('imageInput');
 const uploadButton = document.getElementById('uploadButton');
