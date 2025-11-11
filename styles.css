@@ -939,6 +939,334 @@ body {
 .btn-dismiss:hover {
     color: #666;
 }
+/* History Modal Content */
+.history-modal-content {
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-modal-content h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.modal-subtitle {
+    color: #666;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+}
+
+/* History Container - FIXED HEIGHT WITH SCROLL */
+.history-container {
+    max-height: 600px; /* Fixed max height */
+    overflow-y: auto;  /* Enable scroll */
+    overflow-x: hidden;
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
+/* Custom scrollbar */
+.history-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.history-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb:hover {
+    background: #5568d3;
+}
+
+/* =========================================
+   🗑️ DELETE ALL BUTTON
+========================================= */
+
+.delete-all-container {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.btn-delete-all {
+    width: 100%;
+    padding: 14px 20px;
+    border: 2px solid #dc3545;
+    background: white;
+    color: #dc3545;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-delete-all:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete-all:active {
+    transform: translateY(0);
+}
+
+.btn-delete-all span:first-child {
+    font-size: 1.2em;
+}
+
+/* =========================================
+   📋 HISTORY LIST
+========================================= */
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* History Item */
+.history-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.history-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+/* History Item Header */
+.history-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.history-item-icon {
+    font-size: 2em;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+}
+
+.history-item-info {
+    flex: 1;
+}
+
+.history-item-filename {
+    font-weight: 600;
+    color: #333;
+    font-size: 1em;
+    margin-bottom: 4px;
+}
+
+.history-item-date {
+    color: #999;
+    font-size: 0.85em;
+}
+
+/* History Item Caption */
+.history-item-caption {
+    color: #555;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+/* History Item Tags */
+.history-item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.history-tag {
+    background: #f0f2ff;
+    color: #667eea;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+/* History Item Actions */
+.history-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-history-view {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-history-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-history-view:active {
+    transform: translateY(0);
+}
+
+.btn-history-delete {
+    padding: 10px 16px;
+    border: 2px solid #dc3545;
+    background: white;
+    color: #dc3545;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-history-delete:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-history-delete:active {
+    transform: translateY(0);
+}
+
+/* =========================================
+   📭 EMPTY STATE
+========================================= */
+
+.history-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.history-empty p:first-child {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+/* =========================================
+   ⏳ LOADING
+========================================= */
+
+.history-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* =========================================
+   📱 RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+    .history-modal-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .history-container {
+        max-height: 500px;
+    }
+
+    .history-item-header {
+        gap: 10px;
+    }
+
+    .history-item-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5em;
+    }
+
+    .history-item-filename {
+        font-size: 0.95em;
+    }
+
+    .history-item-actions {
+        flex-direction: column;
+    }
+
+    .btn-history-view,
+    .btn-history-delete {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .history-container {
+        max-height: 400px;
+    }
+
+    .btn-delete-all {
+        font-size: 0.95em;
+        padding: 12px 16px;
+    }
+}
+
 
 @media (max-width: 600px) {
     .install-prompt {
