@@ -296,17 +296,9 @@ if (heroUploadZone && heroImageInput) {
 }
 
 console.log('script.js fully loaded');
-
-// =========================================
-// 🏠 LOGO CLICK - Clear results (like F5)
-// =========================================
 const navLogo = document.querySelector('.nav-logo');
 if (navLogo) {
     navLogo.addEventListener('click', () => {
-        const resultsContainer = document.getElementById('resultsContainer');
-        const generateFromTagsSection = document.getElementById('generateFromTagsSection');
-        const generatedImageResult = document.getElementById('generatedImageResult');
-        
         // Hide all result sections
         if (resultsContainer) {
             resultsContainer.classList.remove('show');
@@ -319,10 +311,6 @@ if (navLogo) {
         }
         
         // Clear file input
-        const imageInput = document.getElementById('imageInput');
-        const heroImageInput = document.getElementById('heroImageInput');
-        const selectedFile = document.getElementById('selectedFile');
-        
         if (imageInput) imageInput.value = '';
         if (heroImageInput) heroImageInput.value = '';
         if (selectedFile) {
