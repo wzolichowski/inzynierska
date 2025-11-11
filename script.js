@@ -206,30 +206,14 @@ function showGenerateFromTagsSection() {
     console.log('✅ Generate from tags section shown');
 }
 
-// Create prompt from analysis data
+// Create prompt from analysis data - ONLY TAGS, NO MODIFICATIONS
 function createPromptFromAnalysis(data) {
-    // Use caption as base, add top tags for detail
-    const topTags = data.tags.slice(0, 5).join(', ');
+    // Use ONLY tags, comma-separated
+    // No extra text, no "photorealistic", no modifications
+    const topTags = data.tags.slice(0, 10).join(', ');
     
-    let prompt = '';
-    
-    // If we have a good caption, use it
-    if (data.caption && data.caption !== 'No description') {
-        prompt = data.caption;
-        
-        // Add some tags for more detail
-        if (topTags) {
-            prompt += `, featuring ${topTags}`;
-        }
-    } else {
-        // If no caption, create from tags
-        prompt = `An image with ${topTags}`;
-    }
-    
-    // Add style instructions for better results
-    prompt += ', photorealistic, high quality, detailed';
-    
-    return prompt;
+    // Return ONLY the tags
+    return topTags;
 }
 
 // Hero upload zone handler

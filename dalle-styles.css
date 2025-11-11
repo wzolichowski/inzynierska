@@ -271,12 +271,22 @@
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    /* Fixed height for symmetry */
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .comparison-image-wrapper img {
     max-width: 100%;
+    max-height: 100%;
     border-radius: 8px;
     display: block;
+    object-fit: contain;
+    /* Ensure same size for both images */
+    width: auto;
+    height: auto;
 }
 
 .image-comparison-arrow {

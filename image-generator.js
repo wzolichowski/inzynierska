@@ -107,13 +107,8 @@ if (generateFromTagsBtn) {
                     }, 300);
                 };
                 
-                // Show revised prompt
-                if (data.revised_prompt && data.revised_prompt !== prompt) {
-                    revisedPromptText.textContent = data.revised_prompt;
-                    revisedPromptSection.style.display = 'block';
-                } else {
-                    revisedPromptSection.style.display = 'none';
-                }
+                // Always hide revised prompt section (we use only tags, no modifications)
+                revisedPromptSection.style.display = 'none';
                 
                 // Setup download button
                 downloadGeneratedBtn.onclick = () => downloadGeneratedImage(data.image_url);
