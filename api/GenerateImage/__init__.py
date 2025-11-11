@@ -17,7 +17,6 @@ def verify_firebase_token(token):
         logging.info(f"🔍 Starting token verification...")
         logging.info(f"🔑 Firebase Project ID: {firebase_project_id}")
         logging.info(f"🔑 Firebase API Key present: {'Yes' if firebase_api_key else 'No'}")
-        logging.info(f"🔑 Token length: {len(token) if token else 0} chars")
         
         if not firebase_project_id:
             logging.warning("❌ Firebase project ID not configured")
@@ -28,7 +27,7 @@ def verify_firebase_token(token):
             return None
         
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={firebase_api_key}"
-        logging.info(f"📡 Calling Firebase API...")
+        logging.info(f"📡 Calling Firebase API: {url[:80]}...")
         
         response = requests.post(
             url,
@@ -40,29 +39,21 @@ def verify_firebase_token(token):
         
         if response.status_code == 200:
             data = response.json()
-            logging.info(f"✅ Firebase API returned valid JSON")
+            logging.info(f"✅ Firebase API returned valid data")
             if 'users' in data and len(data['users']) > 0:
                 user = data['users'][0]
                 logging.info(f"✅ Authenticated user: {user.get('email', 'Unknown')}")
                 return user
             else:
-                logging.warning("❌ No users found in Firebase response")
-                logging.warning(f"Response data: {data}")
+                logging.warning("❌ No users found in response")
         else:
             logging.error(f"❌ Firebase API error: {response.status_code}")
-            try:
-                error_data = response.json()
-                logging.error(f"❌ Error details: {error_data}")
-            except:
-                logging.error(f"❌ Response text: {response.text}")
+            logging.error(f"❌ Response body: {response.text[:500]}")  # First 500 chars
         
         return None
         
     except requests.exceptions.Timeout:
         logging.error("❌ Firebase API timeout after 10 seconds")
-        return None
-    except requests.exceptions.RequestException as e:
-        logging.error(f"❌ Firebase API request error: {str(e)}")
         return None
     except Exception as e:
         logging.error(f"❌ Token verification error: {type(e).__name__}: {str(e)}")
@@ -77,23 +68,23 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     
     if auth_header and auth_header.startswith('Bearer '):
         token = auth_header.split(' ')[1]
-        logging.info(f"🔐 Authorization header found, verifying token...")
+        logging.info(f"🔐 Auth header present, token length: {len(token)}")
         user_info = verify_firebase_token(token)
         
         if not user_info:
-            logging.warning("❌ Token verification failed")
+            logging.warning("❌ Invalid or expired token")
             return func.HttpResponse(
                 "Unauthorized: Invalid or expired token. Please log in.",
                 status_code=401
             )
-        else:
-            logging.info(f"✅ User authenticated: {user_info.get('email', 'Unknown')}")
     else:
-        logging.warning("❌ No authorization header provided")
+        logging.warning("❌ No authentication token provided")
         return func.HttpResponse(
             "Unauthorized: No authentication token provided.",
             status_code=401
         )
+    
+    logging.info(f"✅ User authenticated: {user_info.get('email', 'Unknown')}")
     
     # Validate environment variables
     try:
@@ -102,10 +93,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         AZURE_OPENAI_DEPLOYMENT = os.environ.get("AZURE_OPENAI_DALLE_DEPLOYMENT", "dall-e-3")
         AZURE_OPENAI_API_VERSION = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-01")
         
-        logging.info(f"✅ Azure OpenAI Config:")
+        logging.info(f"🔧 Azure OpenAI config:")
         logging.info(f"   Endpoint: {AZURE_OPENAI_ENDPOINT}")
         logging.info(f"   Deployment: {AZURE_OPENAI_DEPLOYMENT}")
         logging.info(f"   API Version: {AZURE_OPENAI_API_VERSION}")
+        logging.info(f"   Key present: {'Yes' if AZURE_OPENAI_KEY else 'No'}")
         
         if not AZURE_OPENAI_KEY or not AZURE_OPENAI_ENDPOINT:
             raise ValueError("Azure OpenAI keys are empty")
@@ -125,14 +117,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         quality = req_body.get('quality', 'standard')  # standard or hd
         style = req_body.get('style', 'vivid')  # vivid or natural
         
-        logging.info(f"📝 Request parameters:")
-        logging.info(f"   Prompt length: {len(prompt)} chars")
+        logging.info(f"📝 Request params:")
+        logging.info(f"   Prompt length: {len(prompt)}")
         logging.info(f"   Size: {size}")
         logging.info(f"   Quality: {quality}")
         logging.info(f"   Style: {style}")
         
-    except ValueError:
-        logging.error("❌ Invalid JSON in request body")
+    except ValueError as e:
+        logging.error(f"❌ Invalid JSON in request body: {e}")
         return func.HttpResponse(
             "Invalid JSON in request body.",
             status_code=400
@@ -147,7 +139,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     
     if len(prompt) > MAX_PROMPT_LENGTH:
-        logging.warning(f"❌ Prompt too long: {len(prompt)} chars")
+        logging.warning(f"❌ Prompt too long: {len(prompt)} characters")
         return func.HttpResponse(
             f"Prompt too long. Maximum length: {MAX_PROMPT_LENGTH} characters.",
             status_code=400
@@ -164,8 +156,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # Generate image with DALL-E 3
     try:
-        logging.info(f"🎨 Starting image generation for user: {user_info.get('email')}")
-        logging.info(f"📝 Prompt: {prompt[:100]}...")
+        logging.info(f"🎨 Generating image for user: {user_info.get('email')} | Prompt: {prompt[:100]}...")
         
         # Initialize Azure OpenAI client
         client = AzureOpenAI(
@@ -193,8 +184,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         image_url = result.data[0].url
         revised_prompt = result.data[0].revised_prompt if hasattr(result.data[0], 'revised_prompt') else prompt
         
-        logging.info(f"✅ Image generated successfully")
-        logging.info(f"🖼️ Image URL: {image_url[:50]}...")
+        logging.info(f"🖼️ Image URL obtained: {image_url[:100]}...")
         
         response_data = {
             "success": True,
@@ -220,13 +210,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         
         error_message = str(e)
         if "content_policy_violation" in error_message.lower():
-            logging.warning(f"⚠️ Content policy violation for prompt: {prompt[:50]}...")
+            logging.warning(f"⚠️ Content policy violation for prompt: {prompt[:100]}")
             return func.HttpResponse(
                 "Content policy violation: Your prompt was rejected by the safety system.",
                 status_code=400
             )
         
         return func.HttpResponse(
-            "Error during image generation. Please try again.",
+            f"Error during image generation: {error_message[:200]}",
             status_code=500
         )
