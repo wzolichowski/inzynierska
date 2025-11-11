@@ -668,8 +668,34 @@ body {
 ========================================= */
 .history-modal-content {
     max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* ← DODAJ */
+}
+
+/* Dodaj nowe style dla .close: */
+.history-modal-content .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.3s ease;
+    line-height: 1;
+}
+
+.history-modal-content .close:hover {
+    color: #333;
+}
+
+.history-modal-content h2 {
+    margin-bottom: 10px;
+    color: #333;
+    padding-right: 40px; /* ← DODAJ (miejsce na X) */
 }
 
 .history-container {

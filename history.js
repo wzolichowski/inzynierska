@@ -35,6 +35,13 @@ window.addEventListener('click', (e) => {
     }
 });
 
+// Close on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && historyModal.classList.contains('show')) {
+        historyModal.classList.remove('show');
+    }
+});
+
 // Load history from Firestore
 async function loadHistory() {
     if (!currentUser) {
@@ -243,26 +250,36 @@ async function deleteAllHistory() {
             return;
         }
 
-        // Delete all documents in batch
-        const batch = db.batch();
+        const totalDocs = snapshot.size;
+
+        // Delete all documents individually (not batch - to avoid permissions issues)
+        // Firestore security rules check permissions per document, not for batch operations
+        const deletePromises = [];
         snapshot.forEach((doc) => {
-            batch.delete(doc.ref);
+            deletePromises.push(doc.ref.delete());
         });
 
-        await batch.commit();
+        // Wait for all deletes to complete
+        await Promise.all(deletePromises);
 
         // Clear UI
         historyList.innerHTML = '';
         historyEmpty.style.display = 'block';
         historyLoading.classList.remove('show');
 
-        console.log(`✅ Deleted ${snapshot.size} history items`);
-        alert(`Usunięto ${snapshot.size} analiz z historii`);
+        console.log(`✅ Deleted ${totalDocs} history items`);
+        alert(`Usunięto ${totalDocs} analiz z historii`);
 
     } catch (error) {
         console.error('Error deleting all history:', error);
         historyLoading.classList.remove('show');
-        alert('Błąd podczas usuwania historii');
+        
+        // More detailed error message
+        if (error.code === 'permission-denied') {
+            alert('Błąd uprawnień: Sprawdź Firestore Security Rules');
+        } else {
+            alert('Błąd podczas usuwania historii: ' + error.message);
+        }
     }
 }
 
