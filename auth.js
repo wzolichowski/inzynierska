@@ -426,14 +426,29 @@ function getErrorMessage(errorCode) {
 }
 
 // Get current user's ID token
+// Get Firebase ID token for API authentication
 async function getUserToken() {
-    if (!currentUser) return null;
+    if (!currentUser) {
+        console.warn('⚠️ getUserToken: No current user');
+        return null;
+    }
     
     try {
-        const token = await currentUser.getIdToken();
+        // Force token refresh to ensure it's not expired
+        const token = await currentUser.getIdToken(true);  // true = force refresh
+        console.log('✅ Got ID token, length:', token.length);
+        console.log('✅ Token starts with eyJ:', token.startsWith('eyJ'));
+        
+        // Validate token length
+        if (token.length < 500) {
+            console.error('❌ Token too short! Length:', token.length);
+            console.error('❌ This is NOT a valid Firebase ID token!');
+            return null;
+        }
+        
         return token;
     } catch (error) {
-        console.error('Error getting token:', error);
+        console.error('❌ Error getting ID token:', error);
         return null;
     }
 }
