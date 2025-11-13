@@ -358,6 +358,13 @@ function updateUI() {
             console.log('✅ Upload shown');
         }
         
+        // Show features section after login
+        const featuresSection = document.getElementById('featuresSection');
+        if (featuresSection) {
+            featuresSection.style.display = 'grid';
+            console.log('✅ Features section shown');
+        }
+        
         // Clear and load last analysis
         clearResults();
         setTimeout(() => {
@@ -382,6 +389,13 @@ function updateUI() {
         if (uploadSection) {
             uploadSection.style.setProperty('display', 'none', 'important');
             console.log('✅ Upload hidden');
+        }
+        
+        // Hide features section when logged out
+        const featuresSection = document.getElementById('featuresSection');
+        if (featuresSection) {
+            featuresSection.style.display = 'none';
+            console.log('✅ Features section hidden');
         }
         
         clearResults();

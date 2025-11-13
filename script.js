@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
     const resultsContainer = document.getElementById('resultsContainer');
     const generateFromTagsSection = document.getElementById('generateFromTagsSection');
     const generatedImageResult = document.getElementById('generatedImageResult');
+    const featuresSection = document.getElementById('featuresSection');
     
     // Hide all result sections
     if (resultsContainer) {
@@ -17,6 +18,12 @@ window.addEventListener('load', () => {
     }
     if (generatedImageResult) {
         generatedImageResult.style.display = 'none';
+    }
+    
+    // Show features section on page load if user is logged in
+    // (auth.js will handle showing it after login)
+    if (featuresSection && currentUser) {
+        featuresSection.style.display = 'grid';
     }
     
     console.log('✅ Results cleared on page load');
@@ -125,6 +132,12 @@ if (uploadButton) {
         const generateFromTagsSection = document.getElementById('generateFromTagsSection');
         if (generateFromTagsSection) {
             generateFromTagsSection.style.display = 'none';
+        }
+        
+        // Hide features section during analysis
+        const featuresSection = document.getElementById('featuresSection');
+        if (featuresSection) {
+            featuresSection.style.display = 'none';
         }
 
         try {
@@ -296,9 +309,18 @@ if (heroUploadZone && heroImageInput) {
 }
 
 console.log('script.js fully loaded');
+
+// =========================================
+// 🏠 LOGO CLICK - Clear results (like F5)
+// =========================================
 const navLogo = document.querySelector('.nav-logo');
 if (navLogo) {
     navLogo.addEventListener('click', () => {
+        const resultsContainer = document.getElementById('resultsContainer');
+        const generateFromTagsSection = document.getElementById('generateFromTagsSection');
+        const generatedImageResult = document.getElementById('generatedImageResult');
+        const featuresSection = document.getElementById('featuresSection');
+        
         // Hide all result sections
         if (resultsContainer) {
             resultsContainer.classList.remove('show');
@@ -310,7 +332,16 @@ if (navLogo) {
             generatedImageResult.style.display = 'none';
         }
         
+        // Show features section again if user is logged in
+        if (featuresSection && currentUser) {
+            featuresSection.style.display = 'grid';
+        }
+        
         // Clear file input
+        const imageInput = document.getElementById('imageInput');
+        const heroImageInput = document.getElementById('heroImageInput');
+        const selectedFile = document.getElementById('selectedFile');
+        
         if (imageInput) imageInput.value = '';
         if (heroImageInput) heroImageInput.value = '';
         if (selectedFile) {

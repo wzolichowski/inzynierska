@@ -1467,6 +1467,121 @@ body {
         width: 100%;
     }
 }
+.features-section {
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    border-radius: 16px;
+    margin-bottom: 30px;
+    display: none; /* Hidden by default, shown after login */
+}
+
+.features-grid-alt {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Feature Card */
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: #667eea;
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+}
+
+/* Feature Icon Large */
+.feature-icon-large {
+    font-size: 2.5em;
+    margin-bottom: 12px;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    background: linear-gradient(135deg, #f0f2ff, #e8ebff);
+    border-radius: 50%;
+}
+
+/* Feature Title Alt */
+.feature-title-alt {
+    font-size: 1.05em;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Feature Description */
+.feature-description {
+    font-size: 0.85em;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* =========================================
+   📱 RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+    .features-section {
+        padding: 30px 15px;
+    }
+    
+    .features-grid-alt {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .feature-card {
+        padding: 20px 15px;
+    }
+    
+    .feature-icon-large {
+        font-size: 2em;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .feature-title-alt {
+        font-size: 0.95em;
+    }
+    
+    .feature-description {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .features-section {
+        padding: 25px 10px;
+    }
+    
+    .features-grid-alt {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .feature-card {
+        padding: 18px 12px;
+    }
+    
+    .feature-icon-large {
+        font-size: 1.8em;
+        width: 55px;
+        height: 55px;
+    }
+}
 
 @media (max-width: 480px) {
     .history-container {

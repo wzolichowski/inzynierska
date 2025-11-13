@@ -140,7 +140,7 @@
       </div>
 
       <div class="content">
-        <!-- Hero Upload Section (shown when NOT logged in) -->
+        <!-- Hero Upload Section -->
         <div id="heroSection" class="hero-section">
           <h2 class="hero-title">Przeanalizuj swoje zdjęcie za pomocą Azure Computer Vision</h2>
 
@@ -171,6 +171,41 @@
           </div>
         </div>
 
+        <!-- Features Section (visible after login, hidden after analysis) -->
+        <section id="featuresSection" class="features-section" style="display: none;">
+          <div class="features-grid-alt">
+            
+            <!-- Feature 1: Detekcja obiektów -->
+            <div class="feature-card">
+              <div class="feature-icon-large">🎯</div>
+              <h3 class="feature-title-alt">Detekcja obiektów</h3>
+              <p class="feature-description">Automatyczne rozpoznawanie obiektów i ich klasyfikacja</p>
+            </div>
+            
+            <!-- Feature 2: Opis w języku naturalnym -->
+            <div class="feature-card">
+              <div class="feature-icon-large">💬</div>
+              <h3 class="feature-title-alt">Opis w języku naturalnym</h3>
+              <p class="feature-description">Szczegółowy opis obrazu w zrozumiałym języku</p>
+            </div>
+            
+            <!-- Feature 3: Błyskawiczna analiza -->
+            <div class="feature-card">
+              <div class="feature-icon-large">⚡</div>
+              <h3 class="feature-title-alt">Błyskawiczna analiza</h3>
+              <p class="feature-description">Wyniki w kilka sekund dzięki Azure AI</p>
+            </div>
+            
+            <!-- Feature 4: Generuj obraz z tagów -->
+            <div class="feature-card">
+              <div class="feature-icon-large">🎨</div>
+              <h3 class="feature-title-alt">Generuj obraz z tagów</h3>
+              <p class="feature-description">Twórz nowe obrazy na podstawie wykrytych tagów</p>
+            </div>
+            
+          </div>
+        </section>
+        
         <!-- Main Upload Area (shown when logged in) -->
         <div id="uploadSection" style="display: none;">
           <div class="hero-section">
