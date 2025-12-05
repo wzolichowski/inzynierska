@@ -152,7 +152,7 @@ function clearModalErrors() {
     if (registerPasswordConfirm) registerPasswordConfirm.value = '';
 }
 
-// Show error in modal (XSS-safe)
+// Show error in modal
 function showModalError(formElement, message) {
     const oldError = formElement.parentElement.querySelector('.modal-error');
     if (oldError) oldError.remove();
@@ -160,7 +160,6 @@ function showModalError(formElement, message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'modal-error';
 
-    // Create elements safely without innerHTML
     const iconSpan = document.createElement('span');
     iconSpan.className = 'error-icon';
     iconSpan.textContent = '⚠️';
@@ -179,7 +178,7 @@ function showModalError(formElement, message) {
     }, 5000);
 }
 
-// Clear results and reset UI (using shared utility)
+// Clear results and reset UI
 function clearResults() {
     clearAllResults();
 }
@@ -386,11 +385,10 @@ function updateUI() {
     console.log('=== updateUI complete ===');
 }
 
-// Show messages (XSS-safe) - wraps utility function
+// Show messages
 function showMessageLocal(message, type) {
     const statusDiv = document.getElementById('status');
     if (statusDiv) {
-        // Use utility function from utils.js for safe message display
         showMessage(statusDiv, message, type);
 
         setTimeout(() => {
@@ -399,7 +397,7 @@ function showMessageLocal(message, type) {
     }
 }
 
-// Get user-friendly error messages (using shared utility)
+// Get user-friendly error messages
 function getErrorMessage(errorCode) {
     return '❌ ' + getFirebaseErrorMessage(errorCode);
 }

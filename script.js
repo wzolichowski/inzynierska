@@ -205,18 +205,15 @@ if (uploadButton) {
             } else if (response.status === 401) {
                 showMessage(statusDiv, '❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Configuration.', 'error');
                 console.error('401 Unauthorized - sprawdź Application Settings w Azure Portal');
-                // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
                 loadingSpinner.classList.remove('show');
             } else {
                 const errorText = await response.text();
-                // XSS-safe: use showMessage utility
                 showMessage(statusDiv, `Błąd: ${errorText}`, 'error');
                 loadingSpinner.classList.remove('show');
             }
 
         } catch (error) {
             console.error('Błąd wysyłania:', error);
-            // XSS-safe: use showMessage utility
             showMessage(statusDiv, `Błąd sieci: ${error.message}`, 'error');
             loadingSpinner.classList.remove('show');
         } finally {
