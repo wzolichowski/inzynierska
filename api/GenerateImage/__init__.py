@@ -16,7 +16,6 @@ MAX_PROMPT_LENGTH = 1000
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('🎨 DALL-E 3 Image Generation function triggered')
 
-    # Extract and verify Firebase token (using shared module)
     token = extract_token_from_request(req)
 
     if not token:
@@ -27,7 +26,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json"
         )
 
-    # Verify Firebase token using shared module
     is_valid, user_info, error_message = verify_firebase_token(token)
 
     if not is_valid:
