@@ -1,6 +1,4 @@
-// =========================================
-// script.js
-// =========================================
+import { showMessage, clearAllResults } from './utils.js';
 
 // Clear results on page load/refresh
 window.addEventListener('load', () => {
@@ -205,13 +203,13 @@ if (uploadButton) {
                 // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
             } else {
                 const errorText = await response.text();
-                statusDiv.innerHTML = `<div class="result-section error">❌ Błąd: ${errorText}</div>`;
+                showMessage(statusDiv, `❌ Błąd: ${errorText}`, 'error');
                 loadingSpinner.classList.remove('show');
             }
 
         } catch (error) {
             console.error('Błąd wysyłania:', error);
-            statusDiv.innerHTML = `<div class="result-section error">❌ Błąd sieci: ${error.message}</div>`;
+            showMessage(statusDiv, `❌ Błąd sieci: ${error.message}`, 'error');
             loadingSpinner.classList.remove('show');
         } finally {
             uploadButton.disabled = false;

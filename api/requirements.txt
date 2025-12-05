@@ -1,7 +1,5 @@
 azure-functions
-msrestazure
 azure-cognitiveservices-vision-computervision
-firebase
-requests
 msrest
+requests>=2.31.0
 openai>=1.0.0
