@@ -230,13 +230,13 @@ async function viewHistoryItem(docId) {
         
         document.getElementById('resultsContainer').classList.add('show');
         
-        // Store analysis data for generation
         currentAnalysisData = {
             caption: data.caption || 'No description',
             tags: data.tags || [],
             fileName: data.fileName,
             imagePreview: data.imagePreview
         };
+        window.currentAnalysisData = currentAnalysisData;
         
         // Show generate section
         showGenerateFromTagsSection();
