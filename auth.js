@@ -33,21 +33,25 @@ const userGreeting = document.getElementById('userGreeting');
 loginBtn.onclick = () => {
     loginModal.classList.add('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 registerBtn.onclick = () => {
     registerModal.classList.add('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 closeLogin.onclick = () => {
     loginModal.classList.remove('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 closeRegister.onclick = () => {
     registerModal.classList.remove('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 switchToRegister.onclick = (e) => {
@@ -55,6 +59,7 @@ switchToRegister.onclick = (e) => {
     loginModal.classList.remove('show');
     registerModal.classList.add('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 switchToLogin.onclick = (e) => {
@@ -62,6 +67,7 @@ switchToLogin.onclick = (e) => {
     registerModal.classList.remove('show');
     loginModal.classList.add('show');
     clearModalErrors();
+    clearFormFields();
 };
 
 // Forgot Password handler
@@ -118,30 +124,31 @@ if (forgotPassword) {
     };
 }
 
-// Close modal when clicking outside
 window.onclick = (e) => {
     if (e.target === loginModal) {
         loginModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
     }
     if (e.target === registerModal) {
         registerModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
     }
 };
 
-// Clear modal errors AND form fields
 function clearModalErrors() {
     const errorDivs = document.querySelectorAll('.modal-error');
     errorDivs.forEach(div => div.remove());
-    
-    // Clear all form fields
+}
+
+function clearFormFields() {
     const loginEmail = document.getElementById('loginEmail');
     const loginPassword = document.getElementById('loginPassword');
     const registerEmail = document.getElementById('registerEmail');
     const registerPassword = document.getElementById('registerPassword');
     const registerPasswordConfirm = document.getElementById('registerPasswordConfirm');
-    
+
     if (loginEmail) loginEmail.value = '';
     if (loginPassword) loginPassword.value = '';
     if (registerEmail) registerEmail.value = '';
@@ -221,6 +228,7 @@ loginForm.addEventListener('submit', async (e) => {
         await auth.signInWithEmailAndPassword(email, password);
         loginModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
         showMessage('✅ Zalogowano pomyślnie!', 'success');
     } catch (error) {
         console.error('Login error:', error);
@@ -263,6 +271,7 @@ registerForm.addEventListener('submit', async (e) => {
         await auth.createUserWithEmailAndPassword(email, password);
         registerModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
         showMessage('✅ Konto utworzone pomyślnie!', 'success');
     } catch (error) {
         console.error('Registration error:', error);
@@ -274,11 +283,12 @@ registerForm.addEventListener('submit', async (e) => {
 // Google Sign-In (Login)
 loginGoogle.addEventListener('click', async () => {
     clearModalErrors();
-    
+
     try {
         await auth.signInWithPopup(googleProvider);
         loginModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
         showMessage('✅ Zalogowano przez Google!', 'success');
     } catch (error) {
         console.error('Google login error:', error);
@@ -295,11 +305,12 @@ loginGoogle.addEventListener('click', async () => {
 // Google Sign-In (Register)
 registerGoogle.addEventListener('click', async () => {
     clearModalErrors();
-    
+
     try {
         await auth.signInWithPopup(googleProvider);
         registerModal.classList.remove('show');
         clearModalErrors();
+        clearFormFields();
         showMessage('✅ Zarejestrowano przez Google!', 'success');
     } catch (error) {
         console.error('Google registration error:', error);
