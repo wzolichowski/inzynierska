@@ -64,10 +64,15 @@ if (imageInput) {
 // Click on upload area to open file dialog
 if (uploadArea) {
     uploadArea.addEventListener('click', (e) => {
-        // Prevent if clicking on the file input or selected file text
         if (e.target === imageInput || e.target.closest('.selected-file')) {
             return;
         }
+
+        if (!currentUser) {
+            document.getElementById('loginBtn').click();
+            return;
+        }
+
         imageInput.click();
     });
 }
@@ -86,13 +91,18 @@ if (uploadArea) {
     uploadArea.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadArea.classList.remove('drag-over');
-        
+
+        if (!currentUser) {
+            document.getElementById('loginBtn').click();
+            return;
+        }
+
         const file = e.dataTransfer.files[0];
         if (file && (file.type === 'image/jpeg' || file.type === 'image/png')) {
             imageInput.files = e.dataTransfer.files;
             selectedFile.textContent = `📁 ${file.name}`;
             selectedFile.classList.add('show');
-            
+
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
