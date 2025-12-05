@@ -1,3 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200"><rect width="200" height="200" fill="url('#gradient')"></rect><defs><linearGradient id="SvgjsLinearGradient1009" gradientTransform="rotate(0 0.5 0.5)"><stop offset="0%" stop-color="#d6ce5c"></stop><stop offset="100%" stop-color="#d97e71"></stop></linearGradient></defs><g><g fill="#2e3f4e" transform="matrix(9.032093517534538,0,0,9.032093517534538,17.265862849357916,164.21756098207072)" stroke="#e6dbcc" stroke-width="0.35"><path d="M9.98 0L9.15-2.66L4.45-2.66L3.63 0L-0.03 0L5.19-14.22L8.41-14.22L13.66 0L9.98 0ZM6.80-10.23L5.27-5.30L8.33-5.30L6.80-10.23ZM18.35-14.22L18.35 0L14.93 0L14.93-14.22L18.35-14.22Z"></path></g></g></svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
-@media (prefers-color-scheme: dark) { :root { filter: none; } }
-</style></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Purple rounded square background -->
+  <rect x="10" y="10" width="180" height="180" rx="28" fill="#6366F1"/>
+
+  <!-- White AI text -->
+  <text x="100" y="140" font-family="Arial, sans-serif" font-size="110" font-weight="900" fill="white" text-anchor="middle">AI</text>
+</svg>
