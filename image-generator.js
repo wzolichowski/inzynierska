@@ -1,5 +1,7 @@
 // DALL-E 3 Image Generator - Generate from Tags
-// FIXED: Token sent in both header AND body for reliability
+
+// Import utilities
+import { showMessage } from './utils.js';
 
 console.log('image-generator.js loaded');
 
@@ -71,17 +73,15 @@ if (generateFromTagsBtn) {
             console.log('✅ Token validated, sending request...');
             console.log('Authorization header length:', `Bearer ${token}`.length);
             console.log('==================');
-            
-            // IMPORTANT: Send token in BOTH header AND body
-            // Some proxies/CDNs truncate long headers
+
+            // Send token ONLY in Authorization header (security best practice)
             const response = await fetch('/api/GenerateImage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`  // Primary method
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    token: token,  // Backup method (in body)
                     prompt: prompt,
                     size: sizeSelect.value,
                     quality: qualitySelect.value,
@@ -184,24 +184,21 @@ async function downloadGeneratedImage(imageUrl) {
     }
 }
 
-// Show messages for generate section
+// Show messages for generate section (XSS-safe)
 function showGenerateMessage(message, type) {
     if (generateStatus) {
         if (!message) {
             generateStatus.innerHTML = '';
             return;
         }
-        
-        let className = 'generate-message';
-        if (type === 'error') className += ' error';
-        if (type === 'success') className += ' success';
-        if (type === 'info') className += ' info';
-        
-        generateStatus.innerHTML = `<div class="${className}">${message}</div>`;
-        
+
+        // Use utility function for safe message display
+        showMessage(generateStatus, message, type);
+
         if (type !== 'info') {
             setTimeout(() => {
-                if (generateStatus.innerHTML.includes(message)) {
+                // Check if message still exists before clearing
+                if (generateStatus.firstChild) {
                     generateStatus.innerHTML = '';
                 }
             }, 5000);

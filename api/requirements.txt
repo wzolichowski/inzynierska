@@ -1,7 +1,12 @@
+# Azure Functions runtime
 azure-functions
-msrestazure
+
+# Azure Computer Vision (for image analysis)
 azure-cognitiveservices-vision-computervision
-firebase
-requests
-msrest
+msrest  # Required by azure-cognitiveservices-vision-computervision
+
+# Azure OpenAI (for DALL-E 3 image generation)
 openai>=1.0.0
+
+# HTTP requests (for Firebase token verification)
+requests>=2.31.0

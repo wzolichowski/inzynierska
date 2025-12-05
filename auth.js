@@ -1,5 +1,13 @@
 // Authentication Logic
 
+// Import utilities
+import {
+    showMessage,
+    clearAllResults,
+    getFirebaseErrorMessage,
+    isValidEmail
+} from './utils.js';
+
 let currentUser = null;
 
 console.log('auth.js loaded');
@@ -144,62 +152,36 @@ function clearModalErrors() {
     if (registerPasswordConfirm) registerPasswordConfirm.value = '';
 }
 
-// Show error in modal
+// Show error in modal (XSS-safe)
 function showModalError(formElement, message) {
     const oldError = formElement.parentElement.querySelector('.modal-error');
     if (oldError) oldError.remove();
-    
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'modal-error';
-    errorDiv.innerHTML = `
-        <span class="error-icon">⚠️</span>
-        <span class="error-text">${message}</span>
-    `;
-    
+
+    // Create elements safely without innerHTML
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'error-icon';
+    iconSpan.textContent = '⚠️';
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'error-text';
+    textSpan.textContent = message;
+
+    errorDiv.appendChild(iconSpan);
+    errorDiv.appendChild(textSpan);
+
     formElement.parentElement.insertBefore(errorDiv, formElement);
-    
+
     setTimeout(() => {
         errorDiv.remove();
     }, 5000);
 }
 
-// Clear results and reset UI
+// Clear results and reset UI (using shared utility)
 function clearResults() {
-    console.log('Clearing results...');
-    
-    const imagePreview = document.getElementById('imagePreview');
-    if (imagePreview) imagePreview.src = '';
-    
-    const captionText = document.getElementById('captionText');
-    if (captionText) captionText.textContent = '';
-    
-    const tagsContainer = document.getElementById('tagsContainer');
-    if (tagsContainer) tagsContainer.innerHTML = '';
-    
-    const resultsContainer = document.getElementById('resultsContainer');
-    if (resultsContainer) resultsContainer.classList.remove('show');
-    
-    const imageInput = document.getElementById('imageInput');
-    if (imageInput) imageInput.value = '';
-    
-    const selectedFile = document.getElementById('selectedFile');
-    if (selectedFile) {
-        selectedFile.textContent = '';
-        selectedFile.classList.remove('show');
-    }
-    
-    const statusDiv = document.getElementById('status');
-    if (statusDiv) statusDiv.innerHTML = '';
-    
-    // Clear generation section
-    const generateFromTagsSection = document.getElementById('generateFromTagsSection');
-    if (generateFromTagsSection) generateFromTagsSection.style.display = 'none';
-    
-    const generatedImageResult = document.getElementById('generatedImageResult');
-    if (generatedImageResult) generatedImageResult.style.display = 'none';
-    
-    const promptPreview = document.getElementById('promptPreview');
-    if (promptPreview) promptPreview.value = '';
+    clearAllResults();
 }
 
 // Email/Password Login
@@ -219,7 +201,7 @@ loginForm.addEventListener('submit', async (e) => {
         await auth.signInWithEmailAndPassword(email, password);
         loginModal.classList.remove('show');
         clearModalErrors();
-        showMessage('✅ Zalogowano pomyślnie!', 'success');
+        showMessageLocal('✅ Zalogowano pomyślnie!', 'success');
     } catch (error) {
         console.error('Login error:', error);
         const errorMessage = getErrorMessage(error.code);
@@ -261,7 +243,7 @@ registerForm.addEventListener('submit', async (e) => {
         await auth.createUserWithEmailAndPassword(email, password);
         registerModal.classList.remove('show');
         clearModalErrors();
-        showMessage('✅ Konto utworzone pomyślnie!', 'success');
+        showMessageLocal('✅ Konto utworzone pomyślnie!', 'success');
     } catch (error) {
         console.error('Registration error:', error);
         const errorMessage = getErrorMessage(error.code);
@@ -277,14 +259,14 @@ loginGoogle.addEventListener('click', async () => {
         await auth.signInWithPopup(googleProvider);
         loginModal.classList.remove('show');
         clearModalErrors();
-        showMessage('✅ Zalogowano przez Google!', 'success');
+        showMessageLocal('✅ Zalogowano przez Google!', 'success');
     } catch (error) {
         console.error('Google login error:', error);
-        
+
         if (error.code === 'auth/popup-closed-by-user') {
             return;
         }
-        
+
         const errorMessage = getErrorMessage(error.code);
         showModalError(loginForm, errorMessage);
     }
@@ -298,14 +280,14 @@ registerGoogle.addEventListener('click', async () => {
         await auth.signInWithPopup(googleProvider);
         registerModal.classList.remove('show');
         clearModalErrors();
-        showMessage('✅ Zarejestrowano przez Google!', 'success');
+        showMessageLocal('✅ Zarejestrowano przez Google!', 'success');
     } catch (error) {
         console.error('Google registration error:', error);
-        
+
         if (error.code === 'auth/popup-closed-by-user') {
             return;
         }
-        
+
         const errorMessage = getErrorMessage(error.code);
         showModalError(registerForm, errorMessage);
     }
@@ -315,10 +297,10 @@ registerGoogle.addEventListener('click', async () => {
 logoutBtn.addEventListener('click', async () => {
     try {
         await auth.signOut();
-        showMessage('✅ Wylogowano pomyślnie!', 'success');
+        showMessageLocal('✅ Wylogowano pomyślnie!', 'success');
     } catch (error) {
         console.error('Logout error:', error);
-        showMessage('❌ Błąd wylogowania', 'error');
+        showMessageLocal('❌ Błąd wylogowania', 'error');
     }
 });
 
@@ -404,39 +386,22 @@ function updateUI() {
     console.log('=== updateUI complete ===');
 }
 
-// Show messages
-function showMessage(message, type) {
+// Show messages (XSS-safe) - wraps utility function
+function showMessageLocal(message, type) {
     const statusDiv = document.getElementById('status');
     if (statusDiv) {
-        statusDiv.innerHTML = `<div class="result-section ${type === 'error' ? 'error' : ''}">${message}</div>`;
-        
+        // Use utility function from utils.js for safe message display
+        showMessage(statusDiv, message, type);
+
         setTimeout(() => {
             statusDiv.innerHTML = '';
         }, 5000);
     }
 }
 
-// Get user-friendly error messages
+// Get user-friendly error messages (using shared utility)
 function getErrorMessage(errorCode) {
-    const messages = {
-        'auth/user-not-found': '❌ Nie znaleziono konta z tym adresem email',
-        'auth/wrong-password': '❌ Nieprawidłowe hasło',
-        'auth/invalid-email': '❌ Nieprawidłowy adres email',
-        'auth/user-disabled': '❌ To konto zostało zablokowane',
-        'auth/invalid-credential': '❌ Nieprawidłowy email lub hasło',
-        'auth/email-already-in-use': '❌ Ten adres email jest już używany',
-        'auth/weak-password': '❌ Hasło jest za słabe (minimum 6 znaków)',
-        'auth/operation-not-allowed': '❌ Rejestracja jest obecnie niedostępna',
-        'auth/popup-closed-by-user': '❌ Anulowano logowanie',
-        'auth/cancelled-popup-request': '❌ Anulowano żądanie',
-        'auth/popup-blocked': '❌ Popup został zablokowany przez przeglądarkę',
-        'auth/account-exists-with-different-credential': '❌ Konto z tym emailem już istnieje',
-        'auth/network-request-failed': '❌ Błąd połączenia z siecią',
-        'auth/too-many-requests': '❌ Zbyt wiele prób. Spróbuj ponownie później',
-        'auth/internal-error': '❌ Wystąpił błąd serwera. Spróbuj ponownie',
-    };
-    
-    return messages[errorCode] || `❌ Wystąpił błąd: ${errorCode}`;
+    return '❌ ' + getFirebaseErrorMessage(errorCode);
 }
 
 // Get current user's ID token
