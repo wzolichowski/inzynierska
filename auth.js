@@ -339,6 +339,7 @@ logoutBtn.addEventListener('click', async () => {
 auth.onAuthStateChanged((user) => {
     console.log('Auth state changed:', user);
     currentUser = user;
+    window.currentUser = user;
     updateUI();
 });
 
@@ -433,25 +434,25 @@ async function getUserToken() {
         console.warn('⚠️ getUserToken: No current user');
         return null;
     }
-    
+
     try {
-        // Force token refresh to ensure it's not expired
-        const token = await currentUser.getIdToken(true);  // true = force refresh
+        const token = await currentUser.getIdToken(true);
         console.log('✅ Got ID token, length:', token.length);
         console.log('✅ Token starts with eyJ:', token.startsWith('eyJ'));
-        
-        // Validate token length
+
         if (token.length < 500) {
             console.error('❌ Token too short! Length:', token.length);
             console.error('❌ This is NOT a valid Firebase ID token!');
             return null;
         }
-        
+
         return token;
     } catch (error) {
         console.error('❌ Error getting ID token:', error);
         return null;
     }
 }
+
+window.getUserToken = getUserToken;
 
 console.log('auth.js fully loaded');

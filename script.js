@@ -172,6 +172,7 @@ if (uploadButton) {
                     fileName: file.name,
                     imagePreview: imagePreview.src
                 };
+                window.currentAnalysisData = currentAnalysisData;
                 
                 captionText.textContent = currentAnalysisData.caption;
 
@@ -231,21 +232,21 @@ if (uploadButton) {
 function showGenerateFromTagsSection() {
     const generateFromTagsSection = document.getElementById('generateFromTagsSection');
     const promptPreview = document.getElementById('promptPreview');
-    
+
     if (!generateFromTagsSection || !currentAnalysisData) return;
-    
-    // Create prompt from tags and caption
+
     const prompt = createPromptFromAnalysis(currentAnalysisData);
     promptPreview.value = prompt;
-    
-    // Show section with animation
+
     generateFromTagsSection.style.display = 'block';
     setTimeout(() => {
         generateFromTagsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 300);
-    
+
     console.log('✅ Generate from tags section shown');
 }
+
+window.showGenerateFromTagsSection = showGenerateFromTagsSection;
 
 // Create prompt from analysis data - ONLY TAGS, NO MODIFICATIONS
 function createPromptFromAnalysis(data) {
