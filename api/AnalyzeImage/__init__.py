@@ -2,8 +2,11 @@ import logging
 import os
 import json
 import azure.functions as func
-import requests
-#test
+import sys
+
+# Add parent directory to path for shared modules
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from shared.auth import verify_firebase_token, extract_token_from_request
 
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from msrest.authentication import CognitiveServicesCredentials
@@ -12,56 +15,29 @@ from msrest.authentication import CognitiveServicesCredentials
 ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/jpg'}
 MAX_FILE_SIZE = 4 * 1024 * 1024  # 4MB
 
-def verify_firebase_token(token):
-    """Verify Firebase ID token"""
-    try:
-        # Get Firebase project ID from environment
-        firebase_project_id = os.environ.get("FIREBASE_PROJECT_ID")
-        
-        if not firebase_project_id:
-            logging.warning("Firebase project ID not configured")
-            return None
-        
-        # Verify token with Firebase REST API
-        url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={os.environ.get('FIREBASE_API_KEY')}"
-        
-        response = requests.post(
-            url,
-            json={"idToken": token},
-            timeout=5
-        )
-        
-        if response.status_code == 200:
-            data = response.json()
-            if 'users' in data and len(data['users']) > 0:
-                user = data['users'][0]
-                logging.info(f"Authenticated user: {user.get('email', 'Unknown')}")
-                return user
-        
-        return None
-        
-    except Exception as e:
-        logging.error(f"Token verification error: {e}")
-        return None
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Funkcja HTTP Trigger (Upload) została wywołana.')
+    logging.info('🔍 AnalyzeImage function invoked')
 
-    # Verify Firebase token (optional - make required if needed)
-    auth_header = req.headers.get('Authorization')
+    # Extract and verify Firebase token (using shared module)
+    token = extract_token_from_request(req)
     user_info = None
-    
-    if auth_header and auth_header.startswith('Bearer '):
-        token = auth_header.split(' ')[1]
-        user_info = verify_firebase_token(token)
-        
-        if not user_info:
-            logging.warning("Invalid or expired token")
+
+    if token:
+        is_valid, user_data, error_message = verify_firebase_token(token)
+
+        if is_valid:
+            user_info = user_data
+            logging.info(f"✅ Authenticated user: {user_info.get('email', 'Unknown')}")
+        else:
+            logging.warning(f"⚠️ Token verification failed: {error_message}")
             # Uncomment to require authentication:
             # return func.HttpResponse(
-            #     "Unauthorized: Invalid or expired token",
-            #     status_code=401
+            #     json.dumps({"error": error_message}),
+            #     status_code=401,
+            #     mimetype="application/json"
             # )
+    else:
+        logging.info('ℹ️ No authentication token provided (proceeding without auth)')
     
     # Validate environment variables
     try:

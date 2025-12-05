@@ -2,6 +2,9 @@
 // script.js
 // =========================================
 
+// Import utilities
+import { showMessage, clearAllResults } from './utils.js';
+
 // Clear results on page load/refresh
 window.addEventListener('load', () => {
     const resultsContainer = document.getElementById('resultsContainer');
@@ -110,7 +113,7 @@ if (uploadArea) {
 if (uploadButton) {
     uploadButton.addEventListener('click', async () => {
         if (!currentUser) {
-            showMessage('❌ Musisz być zalogowany, aby analizować obrazy!', 'error');
+            showMessage(statusDiv, '❌ Musisz być zalogowany, aby analizować obrazy!', 'error');
             return;
         }
 
@@ -200,18 +203,21 @@ if (uploadButton) {
                 }
                 
             } else if (response.status === 401) {
-                showMessage('❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Configuration.', 'error');
+                showMessage(statusDiv, '❌ Błąd autoryzacji. Sprawdź czy Firebase secrets są w Azure Configuration.', 'error');
                 console.error('401 Unauthorized - sprawdź Application Settings w Azure Portal');
                 // Nie wylogowuj automatycznie - może to być problem z konfiguracją backendu
+                loadingSpinner.classList.remove('show');
             } else {
                 const errorText = await response.text();
-                statusDiv.innerHTML = `<div class="result-section error">❌ Błąd: ${errorText}</div>`;
+                // XSS-safe: use showMessage utility
+                showMessage(statusDiv, `Błąd: ${errorText}`, 'error');
                 loadingSpinner.classList.remove('show');
             }
 
         } catch (error) {
             console.error('Błąd wysyłania:', error);
-            statusDiv.innerHTML = `<div class="result-section error">❌ Błąd sieci: ${error.message}</div>`;
+            // XSS-safe: use showMessage utility
+            showMessage(statusDiv, `Błąd sieci: ${error.message}`, 'error');
             loadingSpinner.classList.remove('show');
         } finally {
             uploadButton.disabled = false;
