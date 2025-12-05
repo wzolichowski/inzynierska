@@ -1,5 +1,8 @@
 // History management for image analyses
 
+// Import utilities
+import { batchAppend, formatRelativeDate } from './utils.js';
+
 console.log('history.js loaded');
 
 const historyButton = document.getElementById('historyButton');
@@ -67,19 +70,28 @@ async function loadHistory() {
             return;
         }
 
-        // Add "Delete All" button at the top
+        // Add "Delete All" button at the top (XSS-safe)
         const deleteAllContainer = document.createElement('div');
         deleteAllContainer.className = 'delete-all-container';
-        deleteAllContainer.innerHTML = `
-            <button class="btn-delete-all" id="deleteAllHistoryBtn">
-                <span>🗑️</span>
-                <span>Usuń całą historię</span>
-            </button>
-        `;
+
+        const deleteAllBtn = document.createElement('button');
+        deleteAllBtn.className = 'btn-delete-all';
+        deleteAllBtn.id = 'deleteAllHistoryBtn';
+
+        const iconSpan = document.createElement('span');
+        iconSpan.textContent = '🗑️';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = 'Usuń całą historię';
+
+        deleteAllBtn.appendChild(iconSpan);
+        deleteAllBtn.appendChild(textSpan);
+        deleteAllContainer.appendChild(deleteAllBtn);
+
         historyList.appendChild(deleteAllContainer);
 
         // Add delete all handler
-        document.getElementById('deleteAllHistoryBtn').addEventListener('click', deleteAllHistory);
+        deleteAllBtn.addEventListener('click', deleteAllHistory);
 
         // Render history items
         snapshot.forEach((doc) => {
@@ -97,7 +109,7 @@ async function loadHistory() {
     }
 }
 
-// Create history item element
+// Create history item element (XSS-safe, no innerHTML)
 function createHistoryItem(docId, data) {
     const item = document.createElement('div');
     item.className = 'history-item';
@@ -106,39 +118,101 @@ function createHistoryItem(docId, data) {
     const timestamp = data.timestamp ? data.timestamp.toDate() : new Date();
     const formattedDate = formatDate(timestamp);
 
-    // Get first 5 tags
-    const tags = data.tags ? data.tags.slice(0, 5) : [];
-    const tagsHTML = tags.map(tag => `<span class="history-tag">${tag}</span>`).join('');
-    const moreTags = data.tags && data.tags.length > 5 ? `<span class="history-tag">+${data.tags.length - 5}</span>` : '';
-
     // Image preview (if available)
-    const imageHTML = data.imagePreview ? `
-        <div class="history-item-image">
-            <img src="${data.imagePreview}" alt="${data.fileName || 'Preview'}">
-        </div>
-    ` : '';
+    if (data.imagePreview) {
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'history-item-image';
 
-    item.innerHTML = `
-        ${imageHTML}
-        <div class="history-item-content">
-            <div class="history-item-header">
-                <div class="history-item-info">
-                    <div class="history-item-filename">${data.fileName || 'Unknown file'}</div>
-                    <div class="history-item-date">${formattedDate}</div>
-                </div>
-            </div>
-            <div class="history-item-caption">${data.caption || 'No description'}</div>
-            <div class="history-item-tags">${tagsHTML}${moreTags}</div>
-            <div class="history-item-actions">
-                <button class="btn-history-view" onclick="viewHistoryItem('${docId}')">
-                    <span>👁️</span> Zobacz
-                </button>
-                <button class="btn-history-delete" onclick="deleteHistoryItem('${docId}')">
-                    <span>🗑️</span>
-                </button>
-            </div>
-        </div>
-    `;
+        const img = document.createElement('img');
+        img.src = data.imagePreview;
+        img.alt = data.fileName || 'Preview';
+
+        imageDiv.appendChild(img);
+        item.appendChild(imageDiv);
+    }
+
+    // Content container
+    const content = document.createElement('div');
+    content.className = 'history-item-content';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'history-item-header';
+
+    const info = document.createElement('div');
+    info.className = 'history-item-info';
+
+    const filename = document.createElement('div');
+    filename.className = 'history-item-filename';
+    filename.textContent = data.fileName || 'Unknown file';
+
+    const date = document.createElement('div');
+    date.className = 'history-item-date';
+    date.textContent = formattedDate;
+
+    info.appendChild(filename);
+    info.appendChild(date);
+    header.appendChild(info);
+    content.appendChild(header);
+
+    // Caption
+    const caption = document.createElement('div');
+    caption.className = 'history-item-caption';
+    caption.textContent = data.caption || 'No description';
+    content.appendChild(caption);
+
+    // Tags (using batchAppend for performance)
+    const tagsDiv = document.createElement('div');
+    tagsDiv.className = 'history-item-tags';
+
+    const tags = data.tags ? data.tags.slice(0, 5) : [];
+    tags.forEach(tag => {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'history-tag';
+        tagSpan.textContent = tag;
+        tagsDiv.appendChild(tagSpan);
+    });
+
+    // More tags indicator
+    if (data.tags && data.tags.length > 5) {
+        const moreTagSpan = document.createElement('span');
+        moreTagSpan.className = 'history-tag';
+        moreTagSpan.textContent = `+${data.tags.length - 5}`;
+        tagsDiv.appendChild(moreTagSpan);
+    }
+
+    content.appendChild(tagsDiv);
+
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'history-item-actions';
+
+    // View button
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'btn-history-view';
+
+    const viewIcon = document.createElement('span');
+    viewIcon.textContent = '👁️';
+    viewBtn.appendChild(viewIcon);
+    viewBtn.appendChild(document.createTextNode(' Zobacz'));
+
+    viewBtn.addEventListener('click', () => viewHistoryItem(docId));
+
+    // Delete button
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn-history-delete';
+
+    const deleteIcon = document.createElement('span');
+    deleteIcon.textContent = '🗑️';
+    deleteBtn.appendChild(deleteIcon);
+
+    deleteBtn.addEventListener('click', () => deleteHistoryItem(docId));
+
+    actions.appendChild(viewBtn);
+    actions.appendChild(deleteBtn);
+    content.appendChild(actions);
+
+    item.appendChild(content);
 
     return item;
 }
@@ -163,17 +237,19 @@ window.viewHistoryItem = async function(docId) {
         }
         
         document.getElementById('captionText').textContent = data.caption || 'No description';
-        
+
+        // Use batchAppend for better performance
         const tagsContainer = document.getElementById('tagsContainer');
-        tagsContainer.innerHTML = '';
         if (data.tags) {
-            data.tags.forEach((tag, index) => {
+            batchAppend(tagsContainer, data.tags, (tag, index) => {
                 const tagElement = document.createElement('div');
                 tagElement.className = 'tag';
                 tagElement.textContent = tag;
                 tagElement.style.animationDelay = `${index * 0.05}s`;
-                tagsContainer.appendChild(tagElement);
+                return tagElement;
             });
+        } else {
+            tagsContainer.innerHTML = '';
         }
         
         document.getElementById('resultsContainer').classList.add('show');
