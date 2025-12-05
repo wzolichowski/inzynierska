@@ -18,7 +18,6 @@ MAX_FILE_SIZE = 4 * 1024 * 1024  # 4MB
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('🔍 AnalyzeImage function invoked')
 
-    # Extract and verify Firebase token (using shared module)
     token = extract_token_from_request(req)
     user_info = None
 

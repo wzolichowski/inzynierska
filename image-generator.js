@@ -74,7 +74,6 @@ if (generateFromTagsBtn) {
             console.log('Authorization header length:', `Bearer ${token}`.length);
             console.log('==================');
 
-            // Send token ONLY in Authorization header (security best practice)
             const response = await fetch('/api/GenerateImage', {
                 method: 'POST',
                 headers: {
@@ -184,7 +183,7 @@ async function downloadGeneratedImage(imageUrl) {
     }
 }
 
-// Show messages for generate section (XSS-safe)
+// Show messages for generate section
 function showGenerateMessage(message, type) {
     if (generateStatus) {
         if (!message) {
@@ -192,12 +191,10 @@ function showGenerateMessage(message, type) {
             return;
         }
 
-        // Use utility function for safe message display
         showMessage(generateStatus, message, type);
 
         if (type !== 'info') {
             setTimeout(() => {
-                // Check if message still exists before clearing
                 if (generateStatus.firstChild) {
                     generateStatus.innerHTML = '';
                 }

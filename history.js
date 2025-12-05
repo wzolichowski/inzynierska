@@ -70,7 +70,7 @@ async function loadHistory() {
             return;
         }
 
-        // Add "Delete All" button at the top (XSS-safe)
+        // Add "Delete All" button at the top
         const deleteAllContainer = document.createElement('div');
         deleteAllContainer.className = 'delete-all-container';
 
@@ -90,7 +90,6 @@ async function loadHistory() {
 
         historyList.appendChild(deleteAllContainer);
 
-        // Add delete all handler
         deleteAllBtn.addEventListener('click', deleteAllHistory);
 
         // Render history items
@@ -109,7 +108,7 @@ async function loadHistory() {
     }
 }
 
-// Create history item element (XSS-safe, no innerHTML)
+// Create history item element
 function createHistoryItem(docId, data) {
     const item = document.createElement('div');
     item.className = 'history-item';
@@ -161,7 +160,7 @@ function createHistoryItem(docId, data) {
     caption.textContent = data.caption || 'No description';
     content.appendChild(caption);
 
-    // Tags (using batchAppend for performance)
+    // Tags
     const tagsDiv = document.createElement('div');
     tagsDiv.className = 'history-item-tags';
 
@@ -238,7 +237,6 @@ window.viewHistoryItem = async function(docId) {
         
         document.getElementById('captionText').textContent = data.caption || 'No description';
 
-        // Use batchAppend for better performance
         const tagsContainer = document.getElementById('tagsContainer');
         if (data.tags) {
             batchAppend(tagsContainer, data.tags, (tag, index) => {
